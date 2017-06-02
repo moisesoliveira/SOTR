@@ -29,7 +29,7 @@ char buffer[256];
 while (1) {
     bzero(buffer,sizeof(buffer));
     n = read(nodo[cid].newsockfd,buffer,50);
-    printf("Recebeu: %s - %lu\n", buffer,strlen(buffer));
+    printf("Recebeu de [%d]: %s - %lu\n",cid,buffer,strlen(buffer));
         if (n < 0) {
             printf("Erro lendo do socket!\n");
             exit(1);
@@ -44,7 +44,7 @@ while (1) {
                     exit(1);
                 }
             }
-		// COMO LIDAR COM COMANDO SAIR
+		//TODO COMO LIDAR COM COMANDO SAIR
         }
         pthread_mutex_unlock(&m);
 	// MUTEX UNLOCK - GERAL

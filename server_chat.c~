@@ -29,7 +29,7 @@ char buffer[256];
 while (1) {
     bzero(buffer,sizeof(buffer));
     n = read(nodo[cid].newsockfd,buffer,50);
-    printf("Recebeu: %s - %lu\n", buffer,strlen(buffer));
+    printf("Recebeu de [%d]: %s - %lu\n",cid,buffer,strlen(buffer));
         if (n < 0) {
             printf("Erro lendo do socket!\n");
             exit(1);
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
         //receber e setar a porta
         bzero(buffer,sizeof(buffer));
         if (read(nodo[id].newsockfd, buffer, 50)>0)
-            printf("Recebeu do cliente[id]: %c - %ld\n", buffer, strlen(buffer));
+            printf("Recebeu do cliente[%d]: %c - %ld\n",id ,buffer, strlen(buffer));
     // MUTEX LOCK - GERAL
         pthread_mutex_lock(&m);
             if (nodo[id].newsockfd < 0){
