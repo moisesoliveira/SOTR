@@ -52,34 +52,33 @@ while (1) {
 }
 
 int main(int argc, char *argv[]) {
-     struct sockaddr_in serv_addr, cli_addr;
-     socklen_t clilen;
-     int sockfd, portno, sockfd1;
-     //decarar mutex m
-     char buffer[256];
+    struct sockaddr_in serv_addr, cli_addr;
+    socklen_t clilen;
+    int sockfd, portno, sockfd1;
+    char buffer[256];
 //     int n;
-     pthread_t t;
-     printf("%d\n", argc);
-     if (argc < 2) {
-         printf("Erro, porta nao definida!\n");
-         exit(1);
-     }
-     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-     if (sockfd < 0) {
-         printf("Erro abrindo o socket!\n");
-         exit(1);
-     }
-     bzero((char *) &serv_addr, sizeof(serv_addr));
-     portno = atoi(argv[1]);
-     serv_addr.sin_family = AF_INET;
-     serv_addr.sin_addr.s_addr = INADDR_ANY;
-     serv_addr.sin_port = htons(portno);
-     if (bind(sockfd, (struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) {
-         printf("Erro fazendo bind!\n");
-         exit(1);
-     }
-     listen(sockfd,5);
-     
+    pthread_t t;
+    printf("%d\n", argc);
+    if (argc < 2) {
+        printf("Erro, porta nao definida!\n");
+        exit(1);
+    }
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        printf("Erro abrindo o socket!\n");
+        exit(1);
+    }
+    bzero((char *) &serv_addr, sizeof(serv_addr));
+    portno = atoi(argv[1]);
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = INADDR_ANY;
+    serv_addr.sin_port = htons(portno);
+    if (bind(sockfd, (struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) {
+        printf("Erro fazendo bind!\n");
+        exit(1);
+    }
+    listen(sockfd,5);
+    
     //faz conexão com um servidor (se existir)
     if (argc > 2){
         struct sockaddr_in serv_addr1;
@@ -102,25 +101,25 @@ int main(int argc, char *argv[]) {
         strcpy(buffer,"9001");
         send(sockfd1, buffer,5,0);
     }
-     while (1) {
+    while (1) {
         nodo[id].newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr,&clilen);
         //receber e setar a porta
         bzero(buffer,sizeof(buffer));
         if (read(nodo[id].newsockfd, buffer, 50)>0)
             printf("Recebeu do cliente: %c - %ld\n", buffer, strlen(buffer));
         //receber e setar o IP
-        pthread_mutex_lock(&m);
     // MUTEX LOCK - GERAL
-     	if (nodo[id].newsockfd < 0) {
-        	printf("Erro no accept!\n");
-         	exit(1);
-    	}
-        pthread_create(&t, NULL, cliente, (void *)id);
-	id++;
+        pthread_mutex_lock(&m);
+            if (nodo[id].newsockfd < 0){
+                printf("Erro no accept!\n");
+                exit(1);
+            }
+            pthread_create(&t, NULL, cliente, (void *)id);
+            id++;
         pthread_mutex_unlock(&m);
-	// MUTEX UNLOCK - GERAL
-     }
-//    close(newsockfd);
-//    close(sockfd);
+    // MUTEX UNLOCK - GERAL
+    }
+    //close(newsockfd);
+    //close(sockfd);
     return 0; 
 }
