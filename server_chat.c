@@ -106,8 +106,7 @@ int main(int argc, char *argv[]) {
         //receber e setar a porta
         bzero(buffer,sizeof(buffer));
         if (read(nodo[id].newsockfd, buffer, 50)>0)
-            printf("Recebeu do cliente: %c - %ld\n", buffer, strlen(buffer));
-        //receber e setar o IP
+            printf("Recebeu do cliente[%d]: %c - %ld\n",id ,buffer, strlen(buffer));
     // MUTEX LOCK - GERAL
         pthread_mutex_lock(&m);
             if (nodo[id].newsockfd < 0){

@@ -102,13 +102,12 @@ int main(int argc, char *argv[]) {
         send(sockfd1, buffer,5,0);
     }
     while (1) {
-       nodo[id].newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr,&clilen);
+        nodo[id].newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr,&clilen);
         //receber e setar a porta
         bzero(buffer,sizeof(buffer));
         if (read(nodo[id].newsockfd, buffer, 50)>0)
-            printf("Recebeu do cliente: %c - %ld\n", buffer, strlen(buffer));
-        //receber e setar o IP
-    // TODO MUTEX LOCK - GERAL
+            printf("Recebeu do cliente[id]: %c - %ld\n", buffer, strlen(buffer));
+    // MUTEX LOCK - GERAL
         pthread_mutex_lock(&m);
             if (nodo[id].newsockfd < 0){
                 printf("Erro no accept!\n");
@@ -117,9 +116,9 @@ int main(int argc, char *argv[]) {
             pthread_create(&t, NULL, cliente, (void *)id);
             id++;
         pthread_mutex_unlock(&m);
-    // TODO MUTEX UNLOCK - GERAL
+    // MUTEX UNLOCK - GERAL
     }
-    close(newsockfd);
-    close(sockfd);
+    //close(newsockfd);
+    //close(sockfd);
     return 0; 
 }
