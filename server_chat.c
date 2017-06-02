@@ -11,7 +11,7 @@ int newsockfd[5];
 int id = 0;
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 
-//para cada nodo:
+    //para cada nodo:
     //socket da conexão (através do acept)
     //porta
     //ip da conexão
