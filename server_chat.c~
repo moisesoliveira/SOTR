@@ -46,8 +46,7 @@ while (1) {
             }
             if (strlen(buffer)>0){
                 shutdown(nodo[cid].newsockfd, 0);
-                close(nodo[cid].newsockfd); //lidando com o comando "sair"
-                break;
+                close(nodo[cid].newsockfd);
             }
 		//TODO COMO LIDAR COM COMANDO SAIR
         }
