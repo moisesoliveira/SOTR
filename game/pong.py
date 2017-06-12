@@ -8,8 +8,10 @@ pygame.init()
 WIDTH = 800 # LARGURA
 HEIGHT = 600 # ALTURA
 tela = pygame.display.set_mode((WIDTH,HEIGHT))
+font = pygame.font.SysFont("calibri",40)
 class Player1:
     def __init__(self):
+        self.score = 0.0
         self.w = 200
         self.h = 10
         self.y = (HEIGHT - self.w)/2
@@ -38,6 +40,7 @@ class Player1:
 
 class Player2:
     def __init__(self):#p = player, 1 ou 2
+        self.score = 0.0
         self.w = 200
         self.h = 10
         self.y = (HEIGHT - self.w)/2
@@ -92,29 +95,18 @@ class Bola:
         y = self.y - self.h/2.0
         tela.blit(self.img,(x,y))
 
-bola = Bola('bola.png',random.randint(0,800),random.randint(0,600))
-player1 = Player1()
-player2 = Player2()
-
-
-sair = False
-while not sair:
-    os.system('clear')
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sair = True
-
+def controls(player1, player2):
         if event.type == KEYDOWN:
-            if event.key == K_UP:
+            if event.key == K_w:
                 player1.move("up")
-            elif event.key == K_DOWN:
+            elif event.key == K_s:
                 player1.move("down")
         elif event.type == KEYUP:
-            if event.key == K_UP:
+            if event.key == K_w:
                 player1.move("stop")
-            elif event.key == K_DOWN:
+            elif event.key == K_s:
                 player1.move("stop")
-                
+
         if event.type == KEYDOWN:
             if event.key == K_UP:
                 player2.move("up")
@@ -125,7 +117,27 @@ while not sair:
                 player2.move("stop")
             elif event.key == K_DOWN:
                 player2.move("stop")
-                
+
+def field(tela,bola, player1, player2):
+    score1 = font.render(str(player1.score), True,(255,255,255))
+    score2 = font.render(str(player2.score), True,(255,255,255))
+#    frame = pygame.draw.rect(tela,(255,255,255),Rect((5,5),(630,470)),2)
+#    middle_line = pygame.draw.aaline(tela,(255,255,255),(330,5),(330,475))
+    tela.blit(score1,(300,100))
+    tela.blit(score2,(500,100))
+
+bola = Bola('bola.png',random.randint(0,800),random.randint(0,600))
+player1 = Player1()
+player2 = Player2()
+
+
+sair = False
+while not sair:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sair = True
+    field(tela, bola, player1, player2)
+    controls(player1, player2)
     tela.fill((192,192,192))
     bola.update()
     bola.desenha(tela)
