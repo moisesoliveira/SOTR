@@ -17,7 +17,6 @@ class Player1:
         self.y = (HEIGHT - self.w)/2
         self.v = 0.0 #velocidade
     def move(self, direction):
-        print direction
         if (direction == "up"):
             self.v = -5.0
         elif (direction == "down"):
@@ -28,7 +27,6 @@ class Player1:
 #        x = self.x - self.w/2.0
 #        y = self.y - self.h/2.0
         pygame.draw.rect(tela,(255,0,0),Rect((5,self.y),(self.h, self.w)),0)
-        print self.y
         #rect(Surface, color, Rect, width=0) -> Rect = 
     def update(self, dt=1):
             self.y = self.y + self.v*dt
@@ -46,7 +44,7 @@ class Player2:
         self.y = (HEIGHT - self.w)/2
         self.v = 0.0 #velocidade
     def move(self, direction):
-        print direction
+#        print direction
         if (direction == "up"):
             self.v = -5.0
         elif (direction == "down"):
@@ -57,7 +55,6 @@ class Player2:
 #        x = self.x - self.w/2.0
 #        y = self.y - self.h/2.0
         pygame.draw.rect(tela,(0,0,255),Rect((WIDTH-self.h - 5,self.y),(self.h, self.w)),0)
-        print self.y
         #rect(Surface, color, Rect, width=0) -> Rect = 
     def update(self, dt=1):
             self.y = self.y + self.v*dt
@@ -68,14 +65,14 @@ class Player2:
                 self.y = 0
 
 class Bola:
-    def __init__(self, arq, x, y):
+    def __init__(self, arq, vx, vy):
         self.img = pygame.image.load(arq).convert_alpha()
         self.w = self.img.get_width()
         self.h = self.img.get_height()
-        self.x = x
-        self.y = y
-        self.vx = 5.0
-        self.vy = 3.0
+        self.x = WIDTH/2
+        self.y = HEIGHT/2
+        self.vx = vx
+        self.vy = vy
         self.ax = 0.0
         self.ay = 0.0
     def update(self,dt=1.0):
@@ -118,15 +115,39 @@ def controls(player1, player2):
             elif event.key == K_DOWN:
                 player2.move("stop")
 
-def field(tela,bola, player1, player2):
-    score1 = font.render(str(player1.score), True,(255,255,255))
-    score2 = font.render(str(player2.score), True,(255,255,255))
+def field(tela, player1, player2):
+    score1 = font.render(str(int(player1.score)), True,(0,0,0))
+    score2 = font.render(str(int(player2.score)), True,(0,0,0))
+    pos1 = font.render(str(int(player1.y)), True,(0,0,0))
+    pos2 = font.render(str(int(player2.y)), True,(0,0,0))
 #    frame = pygame.draw.rect(tela,(255,255,255),Rect((5,5),(630,470)),2)
 #    middle_line = pygame.draw.aaline(tela,(255,255,255),(330,5),(330,475))
-    tela.blit(score1,(300,100))
-    tela.blit(score2,(500,100))
+    tela.blit(score1,(300,50))
+    tela.blit(score2,(500,50))
+    tela.blit(pos1,(0,550))
+    tela.blit(pos2,(700,550))
+def rules(player1, player2, bola):
+#    print player1.y
+    pygame.draw.line(tela, (0,0,255), (bola.x, bola.y), (WIDTH-5 ,player2.y),2)
+    pygame.draw.line(tela, (0,0,255), (bola.x, bola.y), (WIDTH-5 ,player2.y + player2.w),2)
+    if bola.x < 50:
+        if not ((bola.y > player1.y) and (bola.y < player1.y + player1.w)):
+            player2.score = player2.score + 1
+            bola.x = WIDTH/2
+            bola.vx = -bola.vx
+            print "PONTOOO!!"
+    if bola.x > WIDTH - 50:
+        if not ((bola.y > player2.y) and (bola.y < player2.y + player2.w)):
+            player1.score = player1.score + 1
+            bola.x = WIDTH/2
+            bola.vx = -bola.vx
+            print "PONTOOO!!"
 
-bola = Bola('bola.png',random.randint(0,800),random.randint(0,600))
+#vmax = 10
+#vmin = 3
+#rand = random.randint(vmin,vmax)
+#bola = Bola('bola.png',rand,vmax-rand)
+bola = Bola('bola.png',5,0)
 player1 = Player1()
 player2 = Player2()
 
@@ -136,15 +157,17 @@ while not sair:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sair = True
-    field(tela, bola, player1, player2)
+
     controls(player1, player2)
     tela.fill((192,192,192))
     bola.update()
     bola.desenha(tela)
     player1.desenha(tela)
     player2.desenha(tela)
+    field(tela, player1, player2)
     player1.update()
     player2.update()
+    rules(player1, player2, bola)
     pygame.display.flip()
     c.tick(30)
 
