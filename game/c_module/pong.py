@@ -142,4 +142,4 @@ while not sair:
     player2.update()
     rules(player1, player2, bola)
     pygame.display.flip()
-    c.tick(30)
+    c.tick(60)

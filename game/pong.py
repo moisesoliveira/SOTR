@@ -9,6 +9,7 @@ WIDTH = 800 # LARGURA
 HEIGHT = 600 # ALTURA
 tela = pygame.display.set_mode((WIDTH,HEIGHT))
 font = pygame.font.SysFont("calibri",40)
+
 class Player:
     def __init__(self, p):
         self.score = 0.0
@@ -104,17 +105,19 @@ def rules(player1, player2, bola):
 #    pygame.draw.line(tela, (0,0,255), (bola.x, bola.y), (WIDTH-5 ,player2.y),2)
 #    pygame.draw.line(tela, (0,0,255), (bola.x, bola.y), (WIDTH-5 ,player2.y + player2.w),2)
     if bola.x < 50:
+        bola.vx = -bola.vx
         if not ((bola.y > player1.y) and (bola.y < player1.y + player1.w)):
             player2.score = player2.score + 1
             bola.x = WIDTH/2
-            bola.vx = -bola.vx
             print "PONTOOO!!"
+
     if bola.x > WIDTH - 50:
+        bola.vx = -bola.vx
         if not ((bola.y > player2.y) and (bola.y < player2.y + player2.w)):
             player1.score = player1.score + 1
             bola.x = WIDTH/2
-            bola.vx = -bola.vx
             print "PONTOOO!!"
+
 
 vmax = 10
 vmin = 3
