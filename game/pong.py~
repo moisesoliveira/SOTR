@@ -76,8 +76,6 @@ class Bola:
         self.ax = 0.0
         self.ay = 0.0
     def update(self,dt=1.0):
-        self.vx = self.vx + self.ax*dt
-        self.vy = self.vy + self.ay*dt
         self.x = self.x + self.vx*dt
         self.y = self.y + self.vy*dt
         if self.y + self.h/2.0 >= HEIGHT or self.y - self.h/2<= 0:
@@ -120,16 +118,15 @@ def field(tela, player1, player2):
     score2 = font.render(str(int(player2.score)), True,(0,0,0))
     pos1 = font.render(str(int(player1.y)), True,(0,0,0))
     pos2 = font.render(str(int(player2.y)), True,(0,0,0))
-#    frame = pygame.draw.rect(tela,(255,255,255),Rect((5,5),(630,470)),2)
-#    middle_line = pygame.draw.aaline(tela,(255,255,255),(330,5),(330,475))
+    pygame.draw.line(tela, (0,0,0), (WIDTH/2, 0), (WIDTH/2,WIDTH),2)
     tela.blit(score1,(300,50))
     tela.blit(score2,(500,50))
     tela.blit(pos1,(0,550))
     tela.blit(pos2,(700,550))
 def rules(player1, player2, bola):
 #    print player1.y
-    pygame.draw.line(tela, (0,0,255), (bola.x, bola.y), (5 ,player2.y),2)
-    pygame.draw.line(tela, (0,0,255), (bola.x, bola.y), (5 ,player2.y + player2.w),2)
+#    pygame.draw.line(tela, (0,0,255), (bola.x, bola.y), (WIDTH-5 ,player2.y),2)
+#    pygame.draw.line(tela, (0,0,255), (bola.x, bola.y), (WIDTH-5 ,player2.y + player2.w),2)
     if bola.x < 50:
         if not ((bola.y > player1.y) and (bola.y < player1.y + player1.w)):
             player2.score = player2.score + 1
@@ -143,21 +140,21 @@ def rules(player1, player2, bola):
             bola.vx = -bola.vx
             print "PONTOOO!!"
 
-#vmax = 10
-#vmin = 3
-#rand = random.randint(vmin,vmax)
-#bola = Bola('bola.png',rand,vmax-rand)
-bola = Bola('bola.png',5,0)
+vmax = 10
+vmin = 3
+rand = random.randint(vmin,vmax)
+bola = Bola('bola.png',rand,vmax-rand)
+
 player1 = Player1()
 player2 = Player2()
 
-
+start_ticks=pygame.time.get_ticks() 
 sair = False
 while not sair:
+    seconds=(pygame.time.get_ticks()-start_ticks)/1000
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sair = True
-
     controls(player1, player2)
     tela.fill((192,192,192))
     bola.update()
@@ -168,6 +165,10 @@ while not sair:
     player1.update()
     player2.update()
     rules(player1, player2, bola)
+    bola.vx += seconds/30
+    bola.vy += seconds/30
+    os.system('clear')
+    print bola.vx, bola.vy
     pygame.display.flip()
     c.tick(30)
 
