@@ -148,10 +148,8 @@ bola = Bola('bola.png',rand,vmax-rand)
 player1 = Player1()
 player2 = Player2()
 
-start_ticks=pygame.time.get_ticks() 
 sair = False
 while not sair:
-    seconds=(pygame.time.get_ticks()-start_ticks)/1000
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sair = True
@@ -165,10 +163,5 @@ while not sair:
     player1.update()
     player2.update()
     rules(player1, player2, bola)
-    bola.vx += seconds/30
-    bola.vy += seconds/30
-    os.system('clear')
-    print bola.vx, bola.vy
     pygame.display.flip()
     c.tick(30)
-
