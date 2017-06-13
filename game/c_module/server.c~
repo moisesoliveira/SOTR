@@ -11,22 +11,22 @@ int newsockfd[5];
 int id = 0;
 
 void *cliente(void *arg) {
-  int cid = (int)arg;
-  int i, n;
-  char buffer[256];
-  while (1) {
-         bzero(buffer,sizeof(buffer));
-         n = read(newsockfd[cid],buffer,50);
-         printf("Recebeu: %s - %lu\n", buffer,strlen(buffer));
-         if (n < 0) {
-             printf("Erro lendo do socket!\n");
-             exit(1);
-         }
+    int cid = (int)arg;
+    int i, n;
+    char buffer[256];
+    while (1) {
+        bzero(buffer,sizeof(buffer));
+        n = read(newsockfd[cid],buffer,50);
+        printf("Recebeu: %s - %lu\n", buffer,strlen(buffer));
+        if (n < 0) {
+            printf("Erro lendo do socket!\n");
+            exit(1);
+        }
 	// MUTEX LOCK - GERAL
-         for (i = 0;i < id; i++) {
-		if (i != cid) { 
-     	    		n = write(newsockfd[i],buffer,50);
-         		if (n < 0) {
+        for (i = 0;i < id; i++) {
+        if (i != cid) { 
+            n = write(newsockfd[i],buffer,50);
+            if (n < 0) {
              			printf("Erro escrevendo no socket!\n");
              			exit(1);
          		}

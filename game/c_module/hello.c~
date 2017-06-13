@@ -16,11 +16,17 @@ void *testando(void *arg){
             buff[i] = buff[i];
         }
         printf("\e[1;1H\e[2J");
-        printf("O buffer é: ");
-
-        for(i=0;i<T_BUFF;i++){
-            printf("%c", buffer[i]);
-        }
+/*        printf("O buffer é: ");*/
+        printf("id: \t%d\n", buff[0]);
+        printf("p1y: \t%d\n", buff[1]*100+buff[2]*10+buff[3]);
+        printf("p2y: \t%d\n", buff[4]*100+buff[5]*10+buff[6]);
+        printf("bolax: \t%d\n", buff[7]*100+buff[8]*10+buff[9]);
+        printf("bolay: \t%d\n", buff[10]*100+buff[11]*10+buff[12]);
+        printf("pts1: \t%d\n", buff[13]*100+buff[14]*10+buff[15]);
+        printf("pts2: \t%d\n", buff[16]*100+buff[17]*10+buff[18]);
+/*        for(i=0;i<T_BUFF;i++){*/
+/*            printf("%c", buffer[i]);*/
+/*        }*/
         printf("\n");
     }
 }
