@@ -2,7 +2,8 @@ import pygame
 import random
 import os
 from pygame.locals import *
-class game:
+    
+class Game:
     def __init__(self, WIDTH = 800, HEIGHT = 600):
         self.time = pygame.time.Clock()
         pygame.init()
@@ -49,7 +50,7 @@ class game:
                 self.player1.move("up")
             elif event.key == K_s:
                 self.player1.move("down")
-        elif event.type == KEYUP:
+        if event.type == KEYUP:
             if event.key == K_w:
                 self.player1.move("stop")
             elif event.key == K_s:
@@ -60,11 +61,15 @@ class game:
                 self.player2.move("up")
             elif event.key == K_DOWN:
                 self.player2.move("down")
-        elif event.type == KEYUP:
+
+
+        if event.type == KEYUP:
             if event.key == K_UP:
                 self.player2.move("stop")
             elif event.key == K_DOWN:
                 self.player2.move("stop")
+
+
     def run(self):
         sair = False
         while not sair:
@@ -73,16 +78,17 @@ class game:
                     sair = True
             self.controls(event)
             self.tela.fill((192,192,192))
+            self.field()
             self.bola.update()
             self.bola.desenha(self.tela)
+            self.rules()
             self.player1.desenha(self.tela)
             self.player2.desenha(self.tela)
-            self.field()
             self.player1.update()
             self.player2.update()
-            self.rules()
+
             pygame.display.flip()
-            self.time.tick(30)
+            self.time.tick(60)
 
 
 
@@ -91,16 +97,16 @@ class Player:
         self.WIDTH = WIDTH
         self.HEIGHT = HEIGHT
         self.score = 0.0
-        self.w = HEIGHT/3
+        self.w = HEIGHT/4
         self.h = 10
         self.y = (HEIGHT - self.w)/2
         self.v = 0.0 #velocidade
         self.p = p
     def move(self, direction):
         if (direction == "up"):
-            self.v = -7.0
+            self.v = -10.0
         elif (direction == "down"):
-            self.v = 7.0
+            self.v = 10.0
         elif (direction == "stop"):
             self.v = 0
     def desenha(self, tela):
@@ -136,6 +142,8 @@ class Bola:
     def update(self,dt=1.0):
         self.x = self.x + self.vx*dt
         self.y = self.y + self.vy*dt
+
+
         if self.y + self.h/2.0 >= self.HEIGHT or self.y - self.h/2<= 0:
 #            self.y = HEIGHT - self.h/2.0
             self.vy = -self.vy
@@ -146,11 +154,12 @@ class Bola:
     def desenha(self, tela):
         x = self.x - self.w/2.0
         y = self.y - self.h/2.0
+#        self.img = pygame.transform.rotate(self.img, 2)
         tela.blit(self.img,(x,y))
 
 
 if __name__ == '__main__':
-    jogo = game()
+    jogo = Game()
     jogo.run()
 
 
