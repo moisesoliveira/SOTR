@@ -30,11 +30,12 @@ class Game:
     def rules(self):
         if self.bola.x < 50:
             self.bola.vx = -self.bola.vx*1.2
+
             if not ((self.bola.y > self.player1.y) and (self.bola.y < self.player1.y + self.player1.w)):
                 self.player2.score = self.player2.score + 1
                 self.bola.x = self.WIDTH/2
                 self.bola.vx = (self.bola.vx/abs(self.bola.vx))*5.0
-                print "PONTOOO!!"
+                #print "PONTOOO!!"
 
         if self.bola.x > self.WIDTH - 50:
             self.bola.vx = -self.bola.vx*1.2
@@ -42,7 +43,7 @@ class Game:
                 self.player1.score = self.player1.score + 1
                 self.bola.x = self.WIDTH/2
                 self.bola.vx = (self.bola.vx/abs(self.bola.vx))*5.0
-                print "PONTOOO!!"
+                #print "PONTOOO!!"
 
     def controls(self, event):
         if event.type == KEYDOWN:
@@ -129,6 +130,7 @@ class Player:
                 self.y = self.HEIGHT - self.w
             if self.y < 0:
                 self.y = 0
+
     
 
 class Bola:
@@ -147,15 +149,12 @@ class Bola:
     def update(self,dt=1.0):
         self.x = self.x + self.vx*dt
         self.y = self.y + self.vy*dt
+        if self.vx > 70.0:
+            self.vx = 70.0
 
-
-        if self.y + self.h/2.0 >= self.HEIGHT or self.y - self.h/2<= 0:
-#            self.y = HEIGHT - self.h/2.0
+        if self.y + self.h/2.0 >= self.HEIGHT or self.y - self.h/2<= 0: #quando bate em cima ou em baixo
             self.vy = -self.vy
-#        if self.x + self.w/2.0 >= self.HEIGHT or self.x - self.h/2<= 0:
-#            self.x = WIDTH - self.w/2.0
-#            self.vx = -self.vx
-#            print self.x, self.x + self.w/2.0 , self.HEIGHT , self.x - self.h/2
+
     def desenha(self, tela):
         x = self.x - self.w/2.0
         y = self.y - self.h/2.0

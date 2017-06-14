@@ -37,24 +37,24 @@ void *cliente(void *arg){
     }
 }
 
-int main(int argc, char *argv[]) {
+int *connect(int argc, char *argv[]) {
     struct sockaddr_in serv_addr, cli_addr;
     socklen_t clilen;
     int sockfd, portno;
 //     char buffer[256];
 //     int n;
     pthread_t t;
-    if (argc < 2) {
-        printf("Erro, porta nao definida!\n");
-        exit(1);
-    }
+/*    if (argc < 2) {*/
+/*        printf("Erro, porta nao definida!\n");*/
+/*        exit(1);*/
+/*    }*/
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         printf("Erro abrindo o socket!\n");
         exit(1);
     }
     bzero((char *) &serv_addr, sizeof(serv_addr));
-    portno = atoi(argv[1]);
+    portno = 9000//atoi(argv[1]);
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
     serv_addr.sin_port = htons(portno);

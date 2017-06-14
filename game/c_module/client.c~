@@ -9,13 +9,14 @@
 #include <arpa/inet.h>		// inet_aton
 #include <pthread.h>
 
-#define T_BUFF 24
 int sockfd;
-char buffer[T_BUFF];
 
 void printbuff(){
     int i;
-
+    int buff[T_BUFF];
+    for(i=0;i<T_BUFF;i++){
+        buff[i] = buff[i];
+    }
     printf("\e[1;1H\e[2J");
     printf("O buffer é: ");
 
@@ -26,7 +27,7 @@ void printbuff(){
 }
 
 void *leitura(void *arg) {
-//    char buffer[256];
+    char buffer[256];
     int n;
     while (1) {
         bzero(buffer,sizeof(buffer));
