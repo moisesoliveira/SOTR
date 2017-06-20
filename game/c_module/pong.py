@@ -91,6 +91,7 @@ class Game:
             cmodule.add(int(self.player1.p),int(self.player1.y),int(self.player2.y), \
             int(self.bola.x), int(self.bola.y), \
             int(self.player1.score), int(self.player2.score), 1)
+            #cmodule.add(0,0,0,0,0,0,0, 1)
 
 
             pygame.display.flip()

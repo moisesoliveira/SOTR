@@ -10,7 +10,7 @@
 #include <pthread.h>
 
 #define T_BUFF 24
-#define PORTA 9000
+#define PORTA 9999
 int varglobal=0;
 char buffer[T_BUFF];
 pthread_t t;
@@ -102,15 +102,16 @@ void *conn(void *arg) {
 }
 
 
-static PyObject *cmodule_start(PyObject *self){
+static PyObject *cserver_start(PyObject *self){
     pthread_t con;
-    printf("cmodule, estou chamando uma thread!\n");
+    printf("cserver, estou chamando uma thread!\n");
     pthread_create(&con, NULL, conn, NULL);
     Py_RETURN_NONE;
 }
 
-static PyObject *cmodule_add(PyObject *self, PyObject *args){
+static PyObject *cserver_add(PyObject *self, PyObject *args){
     int id, p1x, p2x, bx, by, s1,s2,chk;
+    id = 0;
     if (!PyArg_ParseTuple(args, "iiiiiiii", &id, &p1x, &p2x, &bx, &by, &s1, &s2,&chk))
         return NULL;
     sprintf (buffer,"%d%3.d%3.d%3.d%3.d%3.d%3.d%d", id, p1x, p2x, bx, by, s1,s2,chk);
@@ -120,7 +121,7 @@ static PyObject *cmodule_add(PyObject *self, PyObject *args){
 
 
 
-static PyObject *cmodule_teste(PyObject *self, PyObject *args){
+static PyObject *cserver_teste(PyObject *self, PyObject *args){
     int a;
     int b;
     if (!PyArg_ParseTuple(args, "ii", &a, &b))
@@ -133,12 +134,12 @@ static PyObject *cmodule_teste(PyObject *self, PyObject *args){
 }
 
 
-static PyMethodDef cmodule_methods[] = {
-    {"start", (PyCFunction) cmodule_start, METH_NOARGS, NULL },
-    {"add", (PyCFunction) cmodule_add, METH_VARARGS, NULL},
-    {"teste", (PyCFunction) cmodule_teste, METH_VARARGS, NULL}
+static PyMethodDef cserver_methods[] = {
+    {"start", (PyCFunction) cserver_start, METH_NOARGS, NULL },
+    {"add", (PyCFunction) cserver_add, METH_VARARGS, NULL},
+    {"teste", (PyCFunction) cserver_teste, METH_VARARGS, NULL}
 };
 
-PyMODINIT_FUNC initcmodule(){
-    Py_InitModule3("cmodule", cmodule_methods, "whatever");
+PyMODINIT_FUNC initcserver(){
+    Py_InitModule3("cserver", cserver_methods, "whatever");
 }

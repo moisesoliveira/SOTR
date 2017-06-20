@@ -103,9 +103,9 @@ void *conn(void *arg) {
 
 
 static PyObject *cmodule_start(PyObject *self){
-    pthread_t conn;
+    pthread_t con;
     printf("cmodule, estou chamando uma thread!\n");
-    pthread_create(&conn, NULL, conn, NULL);
+    pthread_create(&con, NULL, conn, NULL);
     Py_RETURN_NONE;
 }
 
