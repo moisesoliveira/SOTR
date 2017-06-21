@@ -33,11 +33,8 @@ void *cliente(void *arg){
         //}
 	// MUTEX LOCK - GERAL
         pthread_mutex_lock(&mutex);
-//            printf("\e[1;1H\e[2J");
-//            printf("O buffer é: ");
-//            printf("%s\n", buffer);
 
-        for (i = 0;i < id; i++){
+        for (i = 0;i < 2; i++){
             if (i != cid) { 
                 n = write(newsockfd[i],buffer,T_BUFF);
                 if (n < 0) {
@@ -103,6 +100,7 @@ static PyObject *cserver_start(PyObject *self){
     pthread_create(&con, NULL, conn, NULL);
     Py_RETURN_NONE;
 }
+
 
 static PyObject *cserver_add(PyObject *self, PyObject *args){
     int id, p1x, p2x, bx, by, s1,s2,chk;
