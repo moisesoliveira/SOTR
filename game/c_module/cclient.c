@@ -15,25 +15,20 @@
 int sockfd;
 char buffer[T_BUFF];
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-void printbuff(){
-    int i;
-//    printf("\e[1;1H\e[2J");
-//    printf("O buffer é: ");
-
-    for(i=0;i<T_BUFF;i++){
-        printf("%c", buffer[i]);
-    }
-    printf("\n");
-}
 
 void *leitura(void *arg) {
 //    char buffer[256];
-    int n;
+    int n, i;
     while (1) {
-//        pthread_mutex_lock(&mutex);
+        pthread_mutex_lock(&mutex);
             bzero(buffer,sizeof(buffer));
             n = recv(sockfd,buffer,24,0);
-//        pthread_mutex_unlock(&mutex);
+            for(i=0;i<T_BUFF;i++){
+                if (buffer[i] == ' ')
+                    buffer[i] = '0';
+            }
+//            printf("%s\n", buffer);
+        pthread_mutex_unlock(&mutex);
         if (n <= 0) {
             printf("Erro lendo do socket!\n");
             exit(1);
@@ -47,11 +42,7 @@ void *client(void *arg) {
     int portno, n;
     struct sockaddr_in serv_addr;
     pthread_t t;
-//    char buffer[256];
-/*    if (argc < 3) {
-       fprintf(stderr,"Uso: %s nomehost porta\n", argv[0]);
-       exit(0);
-    }*/
+
     portno = 9000;//atoi(argv[2]);
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
@@ -64,7 +55,7 @@ void *client(void *arg) {
 //    inet_aton(argv[1], &serv_addr.sin_addr);
     inet_aton("127.0.0.1", &serv_addr.sin_addr);
     serv_addr.sin_port = htons(portno);
-    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) {
+    if (connect(sockfd,(struct sockaddr_in *) &serv_addr,sizeof(serv_addr)) < 0) {
         printf("Erro conectando!\n");
         return -1;
     }
@@ -95,14 +86,31 @@ static PyObject *cclient_start(PyObject *self){
 }
 
 static PyObject *cclient_pos(PyObject *self, PyObject *args){
-    int i;
+    int inf[7];
+    char temp[5];
+    int head=1, tail=3,i;
     pthread_mutex_lock(&mutex);
-        for(i=0;i<T_BUFF;i++){
-            if (buffer[i] == ' ')
-                buffer[i] = '0';
+        //printf("%s\n", buffer);
+    strncpy (temp, buffer, 1);
+    temp[1] = '\0';
+    inf[0] = atoi(temp);
+//    printf("%d\n", inf[0]);
+    if(inf[0]>0){
+        for (i=1;i<7;i++){
+            strncpy (temp, buffer+head, 3);
+            temp[4] = '\0';
+            inf[i] = atoi(temp);
+            printf("%d\n", inf[i]);
+            head += 3;
+            tail+=3;
         }
-        return Py_BuildValue("s", buffer);
+    }
+    else{
+        printf("pacote perdido!\n");
+    }
     pthread_mutex_unlock(&mutex);
+        return Py_BuildValue("iiiiiii", inf[0], inf[1], inf[2], inf[3], inf[4], inf[5], inf[6]);
+
 }
 
 

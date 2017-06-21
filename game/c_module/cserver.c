@@ -20,10 +20,9 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 void *cliente(void *arg){
-    printf("cliente funcionando!\n");
     int cid = (int)arg;
+    printf("jogador %d online!\n", cid);
     int i, n;
-//    char buffer[T_BUFF];
     while (1) {
         //bzero(buffer,sizeof(buffer));
         //n = read(newsockfd[cid],buffer,50);
@@ -34,23 +33,19 @@ void *cliente(void *arg){
         //}
 	// MUTEX LOCK - GERAL
         pthread_mutex_lock(&mutex);
-            printf("\e[1;1H\e[2J");
-            printf("O buffer é: ");
+//            printf("\e[1;1H\e[2J");
+//            printf("O buffer é: ");
+//            printf("%s\n", buffer);
 
-            printf("%s\n", buffer);
-            printf("\n");
-
-            for (i = 0;i < id; i++){
-                //if (i != cid) {
-                    printf("escrevendo no socket!\n");
-                    n = write(newsockfd[i],buffer,T_BUFF);
-                    if (n < 0) {
-                        printf("Erro escrevendo no socket!\n");
-                        exit(1);
-                    }
-                //}
-		        // COMO LIDAR COM COMANDO SAIR
+        for (i = 0;i < id; i++){
+            if (i != cid) { 
+                n = write(newsockfd[i],buffer,T_BUFF);
+                if (n < 0) {
+                    printf("Erro escrevendo no socket!\n");
+                    exit(1);
+                }
             }
+        }
 	    // MUTEX UNLOCK - GERAL
         pthread_mutex_unlock(&mutex);
     }
