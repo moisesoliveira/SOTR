@@ -10,7 +10,7 @@
 #include <pthread.h>
 
 #define T_BUFF 24
-#define PORTA 9999
+#define PORTA 9000
 int varglobal=0;
 char buffer[T_BUFF];
 pthread_t t;
@@ -114,8 +114,9 @@ static PyObject *cserver_add(PyObject *self, PyObject *args){
     id = 0;
     if (!PyArg_ParseTuple(args, "iiiiiiii", &id, &p1x, &p2x, &bx, &by, &s1, &s2,&chk))
         return NULL;
-    sprintf (buffer,"%d%3.d%3.d%3.d%3.d%3.d%3.d%d", id, p1x, p2x, bx, by, s1,s2,chk);
-
+    pthread_mutex_lock(&mutex);
+        sprintf (buffer,"%d%3.d%3.d%3.d%3.d%3.d%3.d%d", id, p1x, p2x, bx, by, s1,s2,chk);
+    pthread_mutex_unlock(&mutex);
     return Py_BuildValue("i", id);
 }
 

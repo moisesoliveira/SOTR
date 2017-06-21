@@ -9,10 +9,12 @@
 #include <arpa/inet.h>      // inet_aton
 #include <pthread.h>
 #import <Python.h>
+#import <time.h>
 
 #define T_BUFF 24
 int sockfd;
 char buffer[T_BUFF];
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 void printbuff(){
     int i;
 //    printf("\e[1;1H\e[2J");
@@ -28,8 +30,10 @@ void *leitura(void *arg) {
 //    char buffer[256];
     int n;
     while (1) {
-        //bzero(buffer,sizeof(buffer));
-        n = recv(sockfd,buffer,24,0);
+//        pthread_mutex_lock(&mutex);
+            bzero(buffer,sizeof(buffer));
+            n = recv(sockfd,buffer,24,0);
+//        pthread_mutex_unlock(&mutex);
         if (n <= 0) {
             printf("Erro lendo do socket!\n");
             exit(1);
@@ -48,7 +52,7 @@ void *client(void *arg) {
        fprintf(stderr,"Uso: %s nomehost porta\n", argv[0]);
        exit(0);
     }*/
-    portno = 9999;//atoi(argv[2]);
+    portno = 9000;//atoi(argv[2]);
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         printf("Erro criando socket!\n");
@@ -91,20 +95,14 @@ static PyObject *cclient_start(PyObject *self){
 }
 
 static PyObject *cclient_pos(PyObject *self, PyObject *args){
-//    int id, p1x, p2x, bx, by, s1,s2,chk;
-//    if (!PyArg_ParseTuple(args, "iiiiiiii", &id, &p1x, &p2x, &bx, &by, &s1, &s2,&chk))
-//        return NULL;
-//    sprintf (buffer,"%d%3.d%3.d%3.d%3.d%3.d%3.d%d", id, p1x, p2x, bx, by, s1,s2,chk);
-    //printf("buffer: %s", buffer);
-    char buff2[T_BUFF];
     int i;
-    for(i=0;i<T_BUFF;i++){
-        if (buffer[i] == ' ')
-            buff2[i] = '0';
-        else
-            buff2[i] = buffer[i];
-    }
-    return Py_BuildValue("s", buff2);
+    pthread_mutex_lock(&mutex);
+        for(i=0;i<T_BUFF;i++){
+            if (buffer[i] == ' ')
+                buffer[i] = '0';
+        }
+        return Py_BuildValue("s", buffer);
+    pthread_mutex_unlock(&mutex);
 }
 
 
