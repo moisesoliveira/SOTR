@@ -4,7 +4,7 @@ import os
 from pygame.locals import *
     
 class Game:
-    def __init__(self, WIDTH = 1024, HEIGHT = 700):
+    def __init__(self, WIDTH = 800, HEIGHT = 600):
         self.time = pygame.time.Clock()
         pygame.init()
         self.WIDTH = WIDTH # LARGURA
@@ -88,7 +88,7 @@ class Game:
             self.player2.update()
 
             pygame.display.flip()
-            self.time.tick(120)
+            self.time.tick(60)
 
 
 
@@ -139,11 +139,11 @@ class Bola:
         self.vy = vy
         self.ax = 0.0
         self.ay = 0.0
-    def update(self,dt=0.5):
+    def update(self,dt=1.0):
         self.x = self.x + self.vx*dt
         self.y = self.y + self.vy*dt
-        if (self.vx >50.0):
-            self.vx = 50.0
+        if (self.vx >70.0):
+            self.vx = 70.0
 
 
         if self.y + self.h/2.0 >= self.HEIGHT or self.y - self.h/2<= 0:

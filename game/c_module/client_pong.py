@@ -8,6 +8,7 @@ class Client:
     def __init__(self):
         self.WIDTH,self. HEIGHT = 800, 600
         self.tela = pygame.display.set_mode((self.WIDTH,self.HEIGHT))
+        pygame.font.init()
         self.font = pygame.font.SysFont("calibri",40)
         self.img = pygame.image.load('bola.png').convert_alpha()
         self.bola_w = self.img.get_width()
@@ -24,7 +25,7 @@ class Client:
     def recebepos(self):
         buff = cclient.pos()
         if buff[0]>0:
-            print buff
+            #print buff
             self.i = buff[0]
             self.p1x = buff[1]
             self.p2x = buff[2]
@@ -51,15 +52,34 @@ class Client:
         self.tela.blit(score2,(500,50))
 
 
+    def controls(self):
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_UP:
+                    cclient.move("u") #up
+                elif event.key == K_DOWN:
+                    cclient.move("d") #down
+            if event.type == KEYUP:
+                if event.key == K_UP:
+                    cclient.move("s") #stop
+                elif event.key == K_DOWN:
+                    cclient.move("s")
+            if event.type == pygame.QUIT:
+                return True
+            else:
+                return False
+
     def run(self):
         cclient.start()
         pygame.init()
-        while(1):
+        sair = False
+        while not sair:
+            sair = self.controls()
             self.recebepos()
             self.recebepos()
             self.draw()
             pygame.display.flip()
-            self.time.tick(90)
+            self.time.tick(60)
 
 c = Client()
 c.run()

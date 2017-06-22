@@ -14,7 +14,10 @@
 #define T_BUFF 24
 int sockfd;
 char buffer[T_BUFF];
+char direction[2];
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t c = PTHREAD_MUTEX_INITIALIZER;
+//mutex para os controles
 
 void *leitura(void *arg) {
 //    char buffer[256];
@@ -61,10 +64,12 @@ void *client(void *arg) {
     }
     pthread_create(&t, NULL, leitura, NULL);
     do {
-        //bzero(buffer,sizeof(buffer));
+        bzero(buffer,sizeof(buffer));
         //printf("Digite a mensagem (ou sair):");
         //fgets(buffer,50,stdin);
-        //n = send(sockfd,buffer,50,0);
+        pthread_mutex_lock(&c);
+        n = send(sockfd,direction,2,0);
+        pthread_mutex_lock(&c);
         if (n == -1) {
             printf("Erro escrevendo no socket!\n");
             return -1;
@@ -100,7 +105,7 @@ static PyObject *cclient_pos(PyObject *self, PyObject *args){
             strncpy (temp, buffer+head, 3);
             temp[4] = '\0';
             inf[i] = atoi(temp);
-            printf("%d\n", inf[i]);
+            //printf("%d\n", inf[i]);
             head += 3;
             tail+=3;
         }
@@ -113,11 +118,21 @@ static PyObject *cclient_pos(PyObject *self, PyObject *args){
 
 }
 
-
+static PyObject *cclient_move(PyObject *self, PyObject *args){
+    char dir[2];
+    if (!PyArg_ParseTuple(args, "s", &dir))
+        return NULL;
+    pthread_mutex_lock(&c);
+        strcpy(direction, dir);
+    pthread_mutex_unlock(&c);
+    printf("%s", direction);
+    return Py_BuildValue("s", direction);
+}
 
 static PyMethodDef cclient_methods[] = {
     {"start", (PyCFunction) cclient_start, METH_NOARGS, NULL},
-    {"pos", (PyCFunction) cclient_pos, METH_VARARGS, NULL}
+    {"pos", (PyCFunction) cclient_pos, METH_VARARGS, NULL},
+    {"move", (PyCFunction) cclient_move, METH_VARARGS, NULL}
 };
 
 PyMODINIT_FUNC initcclient(){
