@@ -2,6 +2,7 @@ import pygame
 import random
 import os
 from pygame.locals import *
+import cmodule
     
 class Game:
     def __init__(self, WIDTH = 800, HEIGHT = 600):
@@ -29,12 +30,12 @@ class Game:
     def rules(self):
         if self.bola.x < 50:
             self.bola.vx = -self.bola.vx*1.2
+
             if not ((self.bola.y > self.player1.y) and (self.bola.y < self.player1.y + self.player1.w)):
                 self.player2.score = self.player2.score + 1
                 self.bola.x = self.WIDTH/2
                 self.bola.vx = (self.bola.vx/abs(self.bola.vx))*5.0
-                print "PONTOOO!!"
-            
+                #print "PONTOOO!!"
 
         if self.bola.x > self.WIDTH - 50:
             self.bola.vx = -self.bola.vx*1.2
@@ -42,7 +43,7 @@ class Game:
                 self.player1.score = self.player1.score + 1
                 self.bola.x = self.WIDTH/2
                 self.bola.vx = (self.bola.vx/abs(self.bola.vx))*5.0
-                print "PONTOOO!!"
+                #print "PONTOOO!!"
 
     def controls(self, event):
         if event.type == KEYDOWN:
@@ -71,6 +72,7 @@ class Game:
 
 
     def run(self):
+        cmodule.start()
         sair = False
         while not sair:
             for event in pygame.event.get():
@@ -79,13 +81,18 @@ class Game:
             self.controls(event)
             self.tela.fill((192,192,192))
             self.field()
-            self.bola.update()
             self.bola.desenha(self.tela)
             self.rules()
             self.player1.desenha(self.tela)
             self.player2.desenha(self.tela)
+            self.bola.update()
             self.player1.update()
             self.player2.update()
+            cmodule.add(int(self.player1.p),int(self.player1.y),int(self.player2.y), \
+            int(self.bola.x), int(self.bola.y), \
+            int(self.player1.score), int(self.player2.score), 1)
+            #cmodule.add(0,0,0,0,0,0,0, 1)
+
 
             pygame.display.flip()
             self.time.tick(60)
@@ -124,6 +131,7 @@ class Player:
                 self.y = self.HEIGHT - self.w
             if self.y < 0:
                 self.y = 0
+
     
 
 class Bola:
@@ -142,17 +150,12 @@ class Bola:
     def update(self,dt=1.0):
         self.x = self.x + self.vx*dt
         self.y = self.y + self.vy*dt
-        if (self.vx >70.0):
+        if self.vx > 70.0:
             self.vx = 70.0
 
-
-        if self.y + self.h/2.0 >= self.HEIGHT or self.y - self.h/2<= 0:
-#            self.y = HEIGHT - self.h/2.0
+        if self.y + self.h/2.0 >= self.HEIGHT or self.y - self.h/2<= 0: #quando bate em cima ou em baixo
             self.vy = -self.vy
-#        if self.x + self.w/2.0 >= self.HEIGHT or self.x - self.h/2<= 0:
-#            self.x = WIDTH - self.w/2.0
-#            self.vx = -self.vx
-#            print self.x, self.x + self.w/2.0 , self.HEIGHT , self.x - self.h/2
+
     def desenha(self, tela):
         x = self.x - self.w/2.0
         y = self.y - self.h/2.0

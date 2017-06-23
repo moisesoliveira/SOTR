@@ -20,9 +20,10 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 void *cliente(void *arg){
+    printf("cliente funcionando!\n");
     int cid = (int)arg;
-    printf("jogador %d online!\n", cid);
     int i, n;
+//    char buffer[T_BUFF];
     while (1) {
         //bzero(buffer,sizeof(buffer));
         //n = read(newsockfd[cid],buffer,50);
@@ -33,16 +34,23 @@ void *cliente(void *arg){
         //}
 	// MUTEX LOCK - GERAL
         pthread_mutex_lock(&mutex);
+            printf("\e[1;1H\e[2J");
+            printf("O buffer é: ");
 
-        for (i = 0;i < 2; i++){
-            if (i != cid) { 
-                n = write(newsockfd[i],buffer,T_BUFF);
-                if (n < 0) {
-                    printf("Erro escrevendo no socket!\n");
-                    exit(1);
-                }
+            printf("%s\n", buffer);
+            printf("\n");
+
+            for (i = 0;i < id; i++){
+                //if (i != cid) {
+                    printf("escrevendo no socket!\n");
+                    n = write(newsockfd[i],buffer,T_BUFF);
+                    if (n < 0) {
+                        printf("Erro escrevendo no socket!\n");
+                        exit(1);
+                    }
+                //}
+		        // COMO LIDAR COM COMANDO SAIR
             }
-        }
 	    // MUTEX UNLOCK - GERAL
         pthread_mutex_unlock(&mutex);
     }
@@ -100,7 +108,6 @@ static PyObject *cserver_start(PyObject *self){
     pthread_create(&con, NULL, conn, NULL);
     Py_RETURN_NONE;
 }
-
 
 static PyObject *cserver_add(PyObject *self, PyObject *args){
     int id, p1x, p2x, bx, by, s1,s2,chk;
