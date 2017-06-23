@@ -6,6 +6,7 @@ Instruções:
 primeiramente execute os seguintes comandos para criar o modulo de comunicação:
 
 $python setupc.py install
+
 $python setups.py install
 
 Depois execute o servidor:
