@@ -8,6 +8,7 @@ class Client:
     def __init__(self):
         self.WIDTH,self. HEIGHT = 800, 600
         self.tela = pygame.display.set_mode((self.WIDTH,self.HEIGHT))
+        pygame.display.set_caption('client', 'Spine Runtime')
         #self.font = pygame.font.SysFont("calibri",40)
         self.img = pygame.image.load('bola.png').convert_alpha()
         self.bola_w = self.img.get_width()
@@ -41,16 +42,39 @@ class Client:
         pygame.draw.rect(self.tela,(0,0,255),Rect((self.WIDTH-15,self.p2x),(10, self.HEIGHT/4)),0)
         self.tela.blit(self.img,(self.bx-(self.bola_w/2.0),self.by-(self.bola_h/2.0)))
 
+#modulo cclient.move em desenvolvimento
+    def controls(self):
+        stop = 3
+        up = 1
+        down = 2
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_UP:
+                    cclient.move(up) #up
+                elif event.key == K_DOWN:
+                    cclient.move(down) #down
+            if event.type == KEYUP:
+                if event.key == K_UP:
+                    cclient.move(stop) #stop
+                elif event.key == K_DOWN:
+                    cclient.move(stop)
+            if event.type == pygame.QUIT:
+                return True
+            else:
+                return False
 
     def run(self, porta):
         pygame.init()
         cclient.start(porta)
         while(1):
+            self.controls()
             self.recebepos()
             self.draw()
             pygame.display.flip()
             self.time.tick(60)
-porta = 9001
+
+
+porta = 9003
 #ip = "127.0.0.1"
 c = Client()
 c.run(porta)

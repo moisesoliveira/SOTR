@@ -15,7 +15,8 @@
 int sockfd;
 int portno;// = 9000;
 //char ipaddr[] = "127.0.0.1";
-char buffer[T_BUFF];
+char buffer[T_BUFF], direction[2];
+int dir = 3;// direção enviada pelos controles, but int
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void *leitura(void *arg) {
@@ -24,7 +25,7 @@ void *leitura(void *arg) {
     while (1) {
         pthread_mutex_lock(&mutex);
             bzero(buffer,sizeof(buffer));
-            n = recv(sockfd,buffer,24,0);
+            n = recv(sockfd,buffer,T_BUFF,0);
         pthread_mutex_unlock(&mutex);
         if (n <= 0) {
             printf("Erro lendo do socket!\n");
@@ -64,15 +65,17 @@ void *client(void *arg) {
     pthread_create(&t, NULL, leitura, NULL);
     //e segue fazendo a escrita no socket
     do {
-/*        bzero(buffer,sizeof(buffer));
-        printf("Digite a mensagem (ou sair):");
-        fgets(buffer,50,stdin);
-        n = send(sockfd,buffer,50,0);
+        bzero(direction,sizeof(direction));
+//        printf("Digite a mensagem (ou sair):");
+//        fgets(buffer,50,stdin);
+
+        sprintf(direction, "%d",dir);
+        printf("Enviou: %s\n", direction);
+        n = send(sockfd,direction,2,0);
         if (n == -1) {
             printf("Erro escrevendo no socket!\n");
             return n;
         }
-*/
         if (strcmp(buffer,"sair\n") == 0) {
             break;
         }
@@ -115,10 +118,17 @@ static PyObject *cclient_pos(PyObject *self, PyObject *args){
 
 }
 
+static PyObject *cclient_move(PyObject *self, PyObject *args){
+    if (!PyArg_ParseTuple(args, "i", &dir))
+        return NULL;
+//    printf("%d", dir);
+    Py_RETURN_NONE;
+}
 
 static PyMethodDef cclient_methods[] = {
     {"start", (PyCFunction) cclient_start, METH_VARARGS, NULL},
-    {"pos", (PyCFunction) cclient_pos, METH_VARARGS, NULL}
+    {"pos", (PyCFunction) cclient_pos, METH_VARARGS, NULL},
+    {"move", (PyCFunction) cclient_move, METH_VARARGS, NULL}
 };
 
 PyMODINIT_FUNC initcclient(){

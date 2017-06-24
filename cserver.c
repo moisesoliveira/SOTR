@@ -12,7 +12,7 @@
 #define T_BUFF 24
 //#define PORTA 9000
 int portno;
-char buffer[T_BUFF];
+char buffer[T_BUFF], direction[2];
 pthread_t t;
 int newsockfd[2];
 int id = 0;
@@ -25,24 +25,25 @@ void *cliente(void *arg){
     int i, n;
 //    char buffer[T_BUFF];
     while (1) {
-        //bzero(buffer,sizeof(buffer));
-        //n = read(newsockfd[cid],buffer,50);
-        //printf("Recebeu: %s - %lu\n", buffer,strlen(buffer));
-        //if (n < 0) {
-            //printf("Erro lendo do socket!\n");
-            //exit(1);
-        //}
+        bzero(direction,sizeof(direction));
+        n = read(newsockfd[cid],direction,2);
+        printf("\e[1;1H\e[2J");
+        printf("Recebeu de %d: %s\n",cid, direction);
+/*        if (n < 0) {
+            printf("Erro lendo do socket!\n");
+            exit(1);
+        }*/
 	// MUTEX LOCK - GERAL
         pthread_mutex_lock(&mutex);
-            printf("\e[1;1H\e[2J");
-            printf("O buffer é: ");
+//            printf("\e[1;1H\e[2J");
+/*            printf("O buffer é: ");
 
             printf("%s\n", buffer);
             printf("\n");
-
+*/
             for (i = 0;i < id; i++){
                 //if (i != cid) {
-                    printf("escrevendo no socket!\n");
+//                    printf("escrevendo no socket!\n");
                     n = write(newsockfd[i],buffer,T_BUFF);
                     if (n < 0) {
                         printf("Erro escrevendo no socket!\n");
@@ -122,21 +123,6 @@ static PyObject *cserver_add(PyObject *self, PyObject *args){
     pthread_mutex_unlock(&mutex);
     return Py_BuildValue("i", id);
 }
-
-
-
-/*static PyObject *cserver_teste(PyObject *self, PyObject *args){
-    int a;
-    int b;
-    if (!PyArg_ParseTuple(args, "ii", &a, &b))
-        return NULL;
-    a = a+1;
-    printf("running\n");
-    sleep(5);
-    return Py_BuildValue("i", a+b);
-
-}*/
-
 
 static PyMethodDef cserver_methods[] = {
     {"start", (PyCFunction) cserver_start, METH_VARARGS, NULL },

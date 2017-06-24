@@ -11,6 +11,7 @@ class Game:
         self.WIDTH = WIDTH # LARGURA
         self.HEIGHT = HEIGHT # ALTURA
         self.tela = pygame.display.set_mode((WIDTH,HEIGHT))
+        pygame.display.set_caption('server', 'Spine Runtime')
         self.font = pygame.font.SysFont("calibri",40)
         self.player1 = Player(1, self.WIDTH, self.HEIGHT)
         self.player2 = Player(2, self.WIDTH, self.HEIGHT)
@@ -165,6 +166,6 @@ class Bola:
 
 if __name__ == '__main__':
     jogo = Game()
-    jogo.run(9001)
+    jogo.run(9003)
 
 
