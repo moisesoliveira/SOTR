@@ -13,18 +13,10 @@
 
 #define T_BUFF 24
 int sockfd;
+int portno;// = 9000;
+//char ipaddr[] = "127.0.0.1";
 char buffer[T_BUFF];
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-void printbuff(){
-    int i;
-//    printf("\e[1;1H\e[2J");
-//    printf("O buffer é: ");
-
-    for(i=0;i<T_BUFF;i++){
-        printf("%c", buffer[i]);
-    }
-    printf("\n");
-}
 
 void *leitura(void *arg) {
 //    char buffer[256];
@@ -44,7 +36,7 @@ void *leitura(void *arg) {
 }
 
 void *client(void *arg) {
-    int portno, n;
+    int n;//portno;
     struct sockaddr_in serv_addr;
     pthread_t t;
 //    char buffer[256];
@@ -52,13 +44,13 @@ void *client(void *arg) {
        fprintf(stderr,"Uso: %s nomehost porta\n", argv[0]);
        exit(0);
     }*/
-    portno = 9000;//atoi(argv[2]);
+//    portno = 9000;//atoi(argv[2]);
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         printf("Erro criando socket!\n");
         return -1;
     }
-    //bzero((char *) &serv_addr, sizeof(serv_addr));
+    bzero((char *) &serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
 //    serv_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 //    inet_aton(argv[1], &serv_addr.sin_addr);
@@ -68,16 +60,19 @@ void *client(void *arg) {
         printf("Erro conectando!\n");
         return -1;
     }
+    //cria a thread para fazer a leitura do socket
     pthread_create(&t, NULL, leitura, NULL);
+    //e segue fazendo a escrita no socket
     do {
-        //bzero(buffer,sizeof(buffer));
-        //printf("Digite a mensagem (ou sair):");
-        //fgets(buffer,50,stdin);
-        //n = send(sockfd,buffer,50,0);
+/*        bzero(buffer,sizeof(buffer));
+        printf("Digite a mensagem (ou sair):");
+        fgets(buffer,50,stdin);
+        n = send(sockfd,buffer,50,0);
         if (n == -1) {
             printf("Erro escrevendo no socket!\n");
-            return -1;
+            return n;
         }
+*/
         if (strcmp(buffer,"sair\n") == 0) {
             break;
         }
@@ -87,9 +82,11 @@ void *client(void *arg) {
 }
 
 
-static PyObject *cclient_start(PyObject *self){
+static PyObject *cclient_start(PyObject *self, PyObject *args){
     pthread_t cli;
-    printf("cclient, estou chamando uma thread!\n");
+    if (!PyArg_ParseTuple(args, "i", &portno))
+        return NULL;
+    printf("cclient, conectando no endereço 127.0.0.1:%d!\n", portno);
     pthread_create(&cli, NULL, client, NULL);
     Py_RETURN_NONE;
 }
@@ -102,14 +99,14 @@ static PyObject *cclient_pos(PyObject *self, PyObject *args){
     strncpy (temp, buffer, 1);
     temp[1] = '\0';
     inf[0] = atoi(temp);
-    printf("%d\n", inf[0]);
+//    printf("%d\n", inf[0]);
     /*converter o buffer para um vetor de numeros 
     inteiros contendo as posições dos objetos do jogo*/
     for (i=1;i<7;i++){
         strncpy (temp, buffer+head, 3);
         temp[4] = '\0';
         inf[i] = atoi(temp);
-        printf("%d\n", inf[i]);
+//        printf("%d\n", inf[i]);
         head += 3;
         tail+=3;
     }
@@ -120,7 +117,7 @@ static PyObject *cclient_pos(PyObject *self, PyObject *args){
 
 
 static PyMethodDef cclient_methods[] = {
-    {"start", (PyCFunction) cclient_start, METH_NOARGS, NULL},
+    {"start", (PyCFunction) cclient_start, METH_VARARGS, NULL},
     {"pos", (PyCFunction) cclient_pos, METH_VARARGS, NULL}
 };
 

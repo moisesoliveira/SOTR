@@ -2,7 +2,7 @@ import pygame
 import random
 import os
 from pygame.locals import *
-import cmodule
+import cserver
     
 class Game:
     def __init__(self, WIDTH = 800, HEIGHT = 600):
@@ -71,8 +71,8 @@ class Game:
                 self.player2.move("stop")
 
 
-    def run(self):
-        cmodule.start()
+    def run(self, porta = 9000):
+        cserver.start(porta)
         sair = False
         while not sair:
             for event in pygame.event.get():
@@ -88,10 +88,10 @@ class Game:
             self.bola.update()
             self.player1.update()
             self.player2.update()
-            cmodule.add(int(self.player1.p),int(self.player1.y),int(self.player2.y), \
+            cserver.add(int(self.player1.p),int(self.player1.y),int(self.player2.y), \
             int(self.bola.x), int(self.bola.y), \
             int(self.player1.score), int(self.player2.score), 1)
-            #cmodule.add(0,0,0,0,0,0,0, 1)
+            #cserver.add(0,0,0,0,0,0,0, 1)
 
 
             pygame.display.flip()
@@ -165,6 +165,6 @@ class Bola:
 
 if __name__ == '__main__':
     jogo = Game()
-    jogo.run()
+    jogo.run(9001)
 
 

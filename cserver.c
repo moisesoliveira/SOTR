@@ -10,8 +10,8 @@
 #include <pthread.h>
 
 #define T_BUFF 24
-#define PORTA 9000
-int varglobal=0;
+//#define PORTA 9000
+int portno;
 char buffer[T_BUFF];
 pthread_t t;
 int newsockfd[2];
@@ -60,7 +60,8 @@ void *cliente(void *arg){
 void *conn(void *arg) {
     struct sockaddr_in serv_addr, cli_addr;
     socklen_t clilen;
-    int sockfd, portno;
+    int sockfd;
+    //int portno;
 //     char buffer[256];
 //     int n;
     pthread_t t[2];
@@ -74,7 +75,7 @@ void *conn(void *arg) {
         exit(1);
     }
     bzero((char *) &serv_addr, sizeof(serv_addr));
-    portno = PORTA;//atoi(argv[1]);
+//    portno = PORTA;//atoi(argv[1]);
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
     serv_addr.sin_port = htons(portno);
@@ -102,9 +103,11 @@ void *conn(void *arg) {
 }
 
 
-static PyObject *cserver_start(PyObject *self){
+static PyObject *cserver_start(PyObject *self, PyObject *args){
     pthread_t con;
-    printf("cserver, estou chamando uma thread!\n");
+    if (!PyArg_ParseTuple(args, "i", &portno))
+        return NULL;
+    printf("cserver, iniciando na porta %d!\n", portno);
     pthread_create(&con, NULL, conn, NULL);
     Py_RETURN_NONE;
 }
@@ -122,7 +125,7 @@ static PyObject *cserver_add(PyObject *self, PyObject *args){
 
 
 
-static PyObject *cserver_teste(PyObject *self, PyObject *args){
+/*static PyObject *cserver_teste(PyObject *self, PyObject *args){
     int a;
     int b;
     if (!PyArg_ParseTuple(args, "ii", &a, &b))
@@ -132,13 +135,14 @@ static PyObject *cserver_teste(PyObject *self, PyObject *args){
     sleep(5);
     return Py_BuildValue("i", a+b);
 
-}
+}*/
 
 
 static PyMethodDef cserver_methods[] = {
-    {"start", (PyCFunction) cserver_start, METH_NOARGS, NULL },
+    {"start", (PyCFunction) cserver_start, METH_VARARGS, NULL },
     {"add", (PyCFunction) cserver_add, METH_VARARGS, NULL},
-    {"teste", (PyCFunction) cserver_teste, METH_VARARGS, NULL}
+//    {"teste", (PyCFunction) cserver_teste, METH_VARARGS, NULL}
+    { NULL, NULL, 0, NULL }
 };
 
 PyMODINIT_FUNC initcserver(){

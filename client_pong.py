@@ -6,7 +6,6 @@ import os
 
 class Client:
     def __init__(self):
-        cclient.start()
         self.WIDTH,self. HEIGHT = 800, 600
         self.tela = pygame.display.set_mode((self.WIDTH,self.HEIGHT))
         #self.font = pygame.font.SysFont("calibri",40)
@@ -43,13 +42,15 @@ class Client:
         self.tela.blit(self.img,(self.bx-(self.bola_w/2.0),self.by-(self.bola_h/2.0)))
 
 
-    def run(self):
+    def run(self, porta):
         pygame.init()
+        cclient.start(porta)
         while(1):
             self.recebepos()
             self.draw()
             pygame.display.flip()
             self.time.tick(60)
-            
+porta = 9001
+#ip = "127.0.0.1"
 c = Client()
-c.run()
+c.run(porta)
