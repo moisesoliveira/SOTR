@@ -5,4 +5,5 @@
 .gitgnore
 .gitgnore~
 *.md~
-
+build/*
+test/*

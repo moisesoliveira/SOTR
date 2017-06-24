@@ -30,10 +30,10 @@ void *leitura(void *arg) {
 //    char buffer[256];
     int n;
     while (1) {
-//        pthread_mutex_lock(&mutex);
+        pthread_mutex_lock(&mutex);
             bzero(buffer,sizeof(buffer));
             n = recv(sockfd,buffer,24,0);
-//        pthread_mutex_unlock(&mutex);
+        pthread_mutex_unlock(&mutex);
         if (n <= 0) {
             printf("Erro lendo do socket!\n");
             exit(1);
@@ -95,16 +95,28 @@ static PyObject *cclient_start(PyObject *self){
 }
 
 static PyObject *cclient_pos(PyObject *self, PyObject *args){
-    int i;
+    int i, head = 1, tail = 3;
+    int inf[7]; //id, p1x, p2x, bx, by, s1,s2; 
+    char temp[5];
     pthread_mutex_lock(&mutex);
-        for(i=0;i<T_BUFF;i++){
-            if (buffer[i] == ' ')
-                buffer[i] = '0';
-        }
-        return Py_BuildValue("s", buffer);
+    strncpy (temp, buffer, 1);
+    temp[1] = '\0';
+    inf[0] = atoi(temp);
+    printf("%d\n", inf[0]);
+    /*converter o buffer para um vetor de numeros 
+    inteiros contendo as posições dos objetos do jogo*/
+    for (i=1;i<7;i++){
+        strncpy (temp, buffer+head, 3);
+        temp[4] = '\0';
+        inf[i] = atoi(temp);
+        printf("%d\n", inf[i]);
+        head += 3;
+        tail+=3;
+    }
     pthread_mutex_unlock(&mutex);
-}
+        return Py_BuildValue("iiiiiii", inf[0], inf[1], inf[2], inf[3], inf[4], inf[5], inf[6]);
 
+}
 
 
 static PyMethodDef cclient_methods[] = {
