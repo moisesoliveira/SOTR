@@ -47,29 +47,43 @@ class Game:
                 #print "PONTOOO!!"
 
     def controls(self, event):
-        if event.type == KEYDOWN:
-            if event.key == K_w:
-                self.player1.move("up")
-            elif event.key == K_s:
-                self.player1.move("down")
-        if event.type == KEYUP:
-            if event.key == K_w:
-                self.player1.move("stop")
-            elif event.key == K_s:
-                self.player1.move("stop")
+        stop = 3
+        up = 1
+        down = 2
+        if cserver.control(1) == up:
+            self.player1.move("up")
+        if cserver.control(1) == down:
+            self.player1.move("down")
+        if cserver.control(1) == stop:
+            self.player1.move("stop")
 
-        if event.type == KEYDOWN:
-            if event.key == K_UP:
-                self.player2.move("up")
-            elif event.key == K_DOWN:
-                self.player2.move("down")
+        if cserver.control(2) == up:
+            self.player2.move("up")
+        if cserver.control(2) == down:
+            self.player2.move("down")
+        if cserver.control(2) == stop:
+            self.player2.move("stop")
+#        if event.type == KEYDOWN:
+#            if event.key == K_w:
+#                self.player1.move("up")
+#            elif event.key == K_s:
+#                self.player1.move("down")
+#        if event.type == KEYUP:
+#            if event.key == K_w:
+#                self.player1.move("stop")
+#            elif event.key == K_s:
+#                self.player1.move("stop")
 
-
-        if event.type == KEYUP:
-            if event.key == K_UP:
-                self.player2.move("stop")
-            elif event.key == K_DOWN:
-                self.player2.move("stop")
+#        if event.type == KEYDOWN:
+#            if event.key == K_UP:
+#                self.player2.move("up")
+#            elif event.key == K_DOWN:
+#                self.player2.move("down")
+#        if event.type == KEYUP:
+#            if event.key == K_UP:
+#                self.player2.move("stop")
+#            elif event.key == K_DOWN:
+#                self.player2.move("stop")
 
 
     def run(self, porta = 9000):

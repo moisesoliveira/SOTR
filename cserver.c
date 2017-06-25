@@ -12,11 +12,12 @@
 #define T_BUFF 24
 //#define PORTA 9000
 int portno;
-char buffer[T_BUFF], direction[2];
+char buffer[T_BUFF], direction[2][2];
 pthread_t t;
 int newsockfd[2];
 int id = 0;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t recept = PTHREAD_MUTEX_INITIALIZER;
 
 
 void *cliente(void *arg){
@@ -25,10 +26,12 @@ void *cliente(void *arg){
     int i, n;
 //    char buffer[T_BUFF];
     while (1) {
-        bzero(direction,sizeof(direction));
-        n = read(newsockfd[cid],direction,2);
-        printf("\e[1;1H\e[2J");
-        printf("Recebeu de %d: %s\n",cid, direction);
+        pthread_mutex_lock(&recept);
+        bzero(direction[cid],sizeof(direction[cid]));
+        n = read(newsockfd[cid],direction[cid],2);
+        pthread_mutex_unlock(&recept);
+/*        printf("\e[1;1H\e[2J");*/
+/*        printf("Recebeu de %d: %s\n",cid, direction[cid]);*/
 /*        if (n < 0) {
             printf("Erro lendo do socket!\n");
             exit(1);
@@ -87,6 +90,7 @@ void *conn(void *arg) {
     listen(sockfd,5);
     while (1) {
         newsockfd[id] = accept(sockfd,(struct sockaddr *) &cli_addr,&clilen);
+
 	// MUTEX LOCK - GERAL
         pthread_mutex_lock(&mutex);
         if (newsockfd[id] < 0) {
@@ -124,10 +128,19 @@ static PyObject *cserver_add(PyObject *self, PyObject *args){
     return Py_BuildValue("i", id);
 }
 
+static PyObject *cserver_control(PyObject *self, PyObject *args){
+    int player = 0;
+    int dir;
+    if (!PyArg_ParseTuple(args, "i", &player))
+        return NULL;
+    dir = atoi(direction[player-1]);
+    return Py_BuildValue("i", dir);
+}
+
 static PyMethodDef cserver_methods[] = {
     {"start", (PyCFunction) cserver_start, METH_VARARGS, NULL },
     {"add", (PyCFunction) cserver_add, METH_VARARGS, NULL},
-//    {"teste", (PyCFunction) cserver_teste, METH_VARARGS, NULL}
+    {"control", (PyCFunction) cserver_control, METH_VARARGS, NULL},
     { NULL, NULL, 0, NULL }
 };
 
