@@ -8,10 +8,13 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <pthread.h>
+#include <errno.h>
+#include <signal.h>
 
 #define T_BUFF 24
 //#define PORTA 9000
 int portno;
+//buffers de envio e recepção de dados do atraves do socket
 char buffer[T_BUFF], direction[2][2];
 pthread_t t;
 int newsockfd[2];
@@ -19,42 +22,36 @@ int id = 0;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t recept = PTHREAD_MUTEX_INITIALIZER;
 
-
 void *cliente(void *arg){
-    printf("cliente funcionando!\n");
     int cid = (int)arg;
     int i, n;
-//    char buffer[T_BUFF];
+
     while (1) {
         pthread_mutex_lock(&recept);
         bzero(direction[cid],sizeof(direction[cid]));
         n = read(newsockfd[cid],direction[cid],2);
         pthread_mutex_unlock(&recept);
-
-	// MUTEX LOCK - GERAL
         pthread_mutex_lock(&mutex);
-
             for (i = 0;i < 2; i++){
-                //if (i != cid) {
-//                    printf("escrevendo no socket!\n");
-                    n = write(newsockfd[i],buffer,T_BUFF);
-                    if (n < 0) {
-                        printf("Erro escrevendo no socket!\n");
-                        exit(1);
-                    }
-            // COMO LIDAR COM COMANDO SAIR (ou nao)
+                if(write(newsockfd[i],buffer,T_BUFF)<0)
+                    printf("Erro lendo do socket!\n");
             }
-	    // MUTEX UNLOCK - GERAL
         pthread_mutex_unlock(&mutex);
     }
 }
 
-
 void *conn(void *arg) {
     struct sockaddr_in serv_addr, cli_addr;
     socklen_t clilen;
-    int sockfd;
+    int sockfd,i;
     pthread_t t[2];
+
+    sigset_t alarm_sig;
+    sigemptyset (&alarm_sig);
+    for (i = SIGRTMIN; i <= SIGRTMAX; i++)
+        sigaddset (&alarm_sig, i);
+    sigprocmask(SIG_BLOCK, &alarm_sig, NULL);
+
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         printf("Erro abrindo o socket!\n");

@@ -18,11 +18,13 @@ class Game:
         self.bola = Bola('bola.png',5.0,3.0, self.HEIGHT, self.HEIGHT)
 
     def field(self):
+        #desenha o placar
         score1 = self.font.render(str(int(self.player1.score)), True,(0,0,0))
         score2 = self.font.render(str(int(self.player2.score)), True,(0,0,0))
         pos1 = self.font.render(str(int(self.player1.y)), True,(0,0,0))
         pos2 = self.font.render(str(int(self.player2.y)), True,(0,0,0))
-        pygame.draw.line(self.tela, (0,0,0), (self.WIDTH/2, 0), (self.WIDTH/2,self.WIDTH),2)
+        #desena a linha no meio da tela
+        pygame.draw.line(self.tela, (0,0,0), (self.WIDTH/2, 0), (self.WIDTH/2,self.HEIGHT),2)
         self.tela.blit(score1,(300,50))
         self.tela.blit(score2,(500,50))
         self.tela.blit(pos1,(0,550))
@@ -36,7 +38,7 @@ class Game:
                 self.player2.score = self.player2.score + 1
                 self.bola.x = self.WIDTH/2
                 self.bola.vx = (self.bola.vx/abs(self.bola.vx))*5.0
-                #print "PONTOOO!!"
+
 
         if self.bola.x > self.WIDTH - 50:
             self.bola.vx = -self.bola.vx*1.2
@@ -44,7 +46,7 @@ class Game:
                 self.player1.score = self.player1.score + 1
                 self.bola.x = self.WIDTH/2
                 self.bola.vx = (self.bola.vx/abs(self.bola.vx))*5.0
-                #print "PONTOOO!!"
+
 
     def controls(self, event):
         stop = 3
