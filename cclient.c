@@ -20,7 +20,6 @@ int dir = 3;// direção enviada pelos controles, but int
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void *leitura(void *arg) {
-//    char buffer[256];
     int n;
     while (1) {
         pthread_mutex_lock(&mutex);
@@ -31,8 +30,6 @@ void *leitura(void *arg) {
             printf("Erro lendo do socket!\n");
             exit(1);
         }
-        //printf("MSG: %s\n",buffer);
-        //printbuff();
     }
 }
 

@@ -63,27 +63,6 @@ class Game:
             self.player2.move("down")
         if cserver.control(2) == stop:
             self.player2.move("stop")
-#        if event.type == KEYDOWN:
-#            if event.key == K_w:
-#                self.player1.move("up")
-#            elif event.key == K_s:
-#                self.player1.move("down")
-#        if event.type == KEYUP:
-#            if event.key == K_w:
-#                self.player1.move("stop")
-#            elif event.key == K_s:
-#                self.player1.move("stop")
-
-#        if event.type == KEYDOWN:
-#            if event.key == K_UP:
-#                self.player2.move("up")
-#            elif event.key == K_DOWN:
-#                self.player2.move("down")
-#        if event.type == KEYUP:
-#            if event.key == K_UP:
-#                self.player2.move("stop")
-#            elif event.key == K_DOWN:
-#                self.player2.move("stop")
 
 
     def run(self, porta = 9000):

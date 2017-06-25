@@ -30,21 +30,11 @@ void *cliente(void *arg){
         bzero(direction[cid],sizeof(direction[cid]));
         n = read(newsockfd[cid],direction[cid],2);
         pthread_mutex_unlock(&recept);
-/*        printf("\e[1;1H\e[2J");*/
-/*        printf("Recebeu de %d: %s\n",cid, direction[cid]);*/
-/*        if (n < 0) {
-            printf("Erro lendo do socket!\n");
-            exit(1);
-        }*/
+
 	// MUTEX LOCK - GERAL
         pthread_mutex_lock(&mutex);
-//            printf("\e[1;1H\e[2J");
-/*            printf("O buffer é: ");
 
-            printf("%s\n", buffer);
-            printf("\n");
-*/
-            for (i = 0;i < id; i++){
+            for (i = 0;i < 2; i++){
                 //if (i != cid) {
 //                    printf("escrevendo no socket!\n");
                     n = write(newsockfd[i],buffer,T_BUFF);
@@ -52,8 +42,7 @@ void *cliente(void *arg){
                         printf("Erro escrevendo no socket!\n");
                         exit(1);
                     }
-                //}
-		        // COMO LIDAR COM COMANDO SAIR
+            // COMO LIDAR COM COMANDO SAIR (ou nao)
             }
 	    // MUTEX UNLOCK - GERAL
         pthread_mutex_unlock(&mutex);
@@ -65,21 +54,13 @@ void *conn(void *arg) {
     struct sockaddr_in serv_addr, cli_addr;
     socklen_t clilen;
     int sockfd;
-    //int portno;
-//     char buffer[256];
-//     int n;
     pthread_t t[2];
-/*    if (argc < 2) {*/
-/*        printf("Erro, porta nao definida!\n");*/
-/*        exit(1);*/
-/*    }*/
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         printf("Erro abrindo o socket!\n");
         exit(1);
     }
     bzero((char *) &serv_addr, sizeof(serv_addr));
-//    portno = PORTA;//atoi(argv[1]);
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
     serv_addr.sin_port = htons(portno);
