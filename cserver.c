@@ -89,8 +89,8 @@ void *cliente(void *arg){
     int cid = (int)arg;
     int i, n;
     char aux[2];
-//    struct periodic_info info;
-//    make_periodic(10000, &info);
+    struct periodic_info info;
+    make_periodic(15000, &info);
     while (1) {
             for (i = 0;i < 2; i++){
                 n = send(newsockfd[cid],buffer,T_BUFF,0);
@@ -100,13 +100,13 @@ void *cliente(void *arg){
                 }
             }
         pthread_mutex_unlock(&mutex);
-//    wait_period(&info);
+    wait_period(&info);
     }
 }
 
 void *printstatus(void *arg){
     struct periodic_info info;
-    make_periodic(15000, &info);
+    make_periodic(150, &info);
 //    int id, p1x, p2x, bx, by, s1,s2,chk;
     while(1){
         printf("\e[H\e[2J"); //printf() para limpar a tela

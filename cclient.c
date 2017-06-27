@@ -13,6 +13,8 @@
 #include <signal.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sys/time.h>
+#include <sys/timerfd.h>
 
 #define T_BUFF 24
 
@@ -71,6 +73,7 @@ static void wait_period(struct periodic_info *info)
 
 	info->wakeups_missed += missed;
 }
+
 //Tarefa responsavel por receber os dados do servidor
 void *leitura(void *arg) {
     int n;
@@ -114,8 +117,8 @@ void *client(void *arg) {
     sigset_t alarm_sig;
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-//    struct periodic_info info;
-//    make_periodic(10000, &info);
+    struct periodic_info info;
+    make_periodic(150, &info);
     sigemptyset(&alarm_sig);
     sigaddset(&alarm_sig, SIGALRM);
     sigprocmask(SIG_BLOCK, &alarm_sig, NULL);
@@ -150,7 +153,7 @@ void *client(void *arg) {
             printf("Erro escrevendo no socket!\n");
             exit(1);
         }
-//        wait_period(&info);
+        wait_period(&info);
     }while (1);
     close(sockfd);
     return 0;
