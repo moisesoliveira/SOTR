@@ -10,7 +10,7 @@
 #include <pthread.h>
 #include <errno.h>
 #include <signal.h>
-
+#include <sys/time.h>
 #define T_BUFF 24
 //#define PORTA 9000
 int portno;
@@ -22,10 +22,43 @@ int id = 0;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t recept = PTHREAD_MUTEX_INITIALIZER;
 
+struct periodic_info {
+	sigset_t alarm_sig;
+};
+
+static int make_periodic(unsigned int period, struct periodic_info *info){
+    int ret;
+    struct itimerval value;
+
+    /* Block SIGALRM in this thread */
+    sigemptyset(&(info->alarm_sig));
+    sigaddset(&(info->alarm_sig), SIGALRM);
+    pthread_sigmask(SIG_BLOCK, &(info->alarm_sig), NULL);
+
+    /* Set the timer to go off after the first period and then
+       repetitively */
+    value.it_value.tv_sec = period / 1000000;
+    value.it_value.tv_usec = period % 1000000;
+    value.it_interval.tv_sec = period / 1000000;
+    value.it_interval.tv_usec = period % 1000000;
+    ret = setitimer(ITIMER_REAL, &value, NULL);
+    if (ret != 0)
+        perror("Failed to set timer");
+    return ret;
+}
+
+static void wait_period(struct periodic_info *info){
+    int sig;
+
+    /* Wait for the next SIGALRM */
+    sigwait(&(info->alarm_sig), &sig);
+}
+
 void *cliente(void *arg){
     int cid = (int)arg;
     int i, n;
-
+    struct periodic_info info;
+    make_periodic(15000, &info)
     while (1) {
         pthread_mutex_lock(&recept);
         bzero(direction[cid],sizeof(direction[cid]));
@@ -37,6 +70,7 @@ void *cliente(void *arg){
                     printf("Erro lendo do socket!\n");
             }
         pthread_mutex_unlock(&mutex);
+    wait_period(&info);
     }
 }
 
@@ -48,8 +82,7 @@ void *conn(void *arg) {
 
     sigset_t alarm_sig;
     sigemptyset (&alarm_sig);
-    for (i = SIGRTMIN; i <= SIGRTMAX; i++)
-        sigaddset (&alarm_sig, i);
+    sigaddset (&alarm_sig, SIGALRM);
     sigprocmask(SIG_BLOCK, &alarm_sig, NULL);
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
