@@ -22,7 +22,7 @@ int portno;
 char buffer[T_BUFF], direction[2];
 int dir = 3;// direção enviada pelos controles, but int
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
+int inf[7];
 
 //Tarefa responsavel por receber os dados do servidor
 void *leitura(void *arg){
@@ -32,7 +32,20 @@ void *leitura(void *arg){
             if (recv(sockfd,buffer,T_BUFF,0) == -1) 
                 printf("Erro lendo do socket!\n");
         pthread_mutex_unlock(&mutex);
+    }
+}
 
+void *printstatus(void *arg){
+//    int id, p1x, p2x, bx, by, s1,s2,chk;
+    while(1){
+        printf("\e[H\e[2J"); //printf() para limpar a tela
+//        printf("Players online:\t\t %d\n", id);
+        printf("Posição do player 1:\t %d\n", inf[1]);
+        printf("Posição do player 2:\t %d\n", inf[2]);
+        printf("Posição da bola:\t %dx%d\n", inf[3],inf[4]);
+        printf("Placar:\t\t\t %dx%d\n", inf[5], inf[6]);
+        printf("comando enviado:\t\t %s\n", direction);
+        usleep(100);
     }
 }
 
@@ -40,7 +53,7 @@ void *leitura(void *arg){
 //aqui sao configurados os sockets e é feito o envio dos dados
 void *client(void *arg) {
     struct sockaddr_in serv_addr;
-    pthread_t t;
+    pthread_t t, p;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         printf("Erro criando socket!\n");
@@ -58,14 +71,19 @@ void *client(void *arg) {
     }
     //cria a thread para fazer a leitura do socket
     pthread_create(&t, NULL, leitura, NULL);
+    pthread_create(&p, NULL, printstatus, NULL);
     //e segue fazendo a escrita no socket
     //aqui pode ser feita uma tarefa periodica
     //mas nao pode deixar de ter um loop, pois é a tarefa principal
     do {
         bzero(direction,sizeof(direction));
         sprintf(direction, "%d",dir);
-        if (send(sockfd,direction,2,0) == -1)
+        if (send(sockfd,direction,2,0) == -1){
             printf("Erro escrevendo no socket!\n");
+            exit(1);
+        }
+//        printf("Enviou %s\n",direction);
+        usleep(1000);
     }while (1);
     close(sockfd);
     return 0;
@@ -87,7 +105,7 @@ static PyObject *cclient_start(PyObject *self, PyObject *args){
 //ela somente converte os dados do buffer e retorna dados do tipo inteiro
 static PyObject *cclient_pos(PyObject *self, PyObject *args){
     int i, head = 1, tail = 3;
-    int inf[7]; //id, p1x, p2x, bx, by, s1,s2; 
+    //int inf[7]; //id, p1x, p2x, bx, by, s1,s2; 
     char temp[5];
     pthread_mutex_lock(&mutex);
     strncpy (temp, buffer, 1);

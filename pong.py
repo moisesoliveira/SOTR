@@ -48,7 +48,7 @@ class Game:
                 self.bola.vx = (self.bola.vx/abs(self.bola.vx))*5.0
 
 
-    def controls(self, event):
+    def controls(self):
         stop = 3
         up = 1
         down = 2
@@ -65,16 +65,15 @@ class Game:
             self.player2.move("down")
         if cserver.control(2) == stop:
             self.player2.move("stop")
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
 
 
     def run(self, porta = 9000):
         cserver.start(porta)
-        sair = False
-        while not sair:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sair = True
-            self.controls(event)
+        while True:
+            self.controls()
             self.tela.fill((192,192,192))
             self.field()
             self.bola.desenha(self.tela)
@@ -88,7 +87,6 @@ class Game:
             int(self.bola.x), int(self.bola.y), \
             int(self.player1.score), int(self.player2.score), 1)
             #cserver.add(0,0,0,0,0,0,0, 1)
-
 
             pygame.display.flip()
             self.time.tick(60)
