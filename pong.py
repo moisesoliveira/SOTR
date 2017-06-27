@@ -1,6 +1,7 @@
 import pygame
 import random
 import os
+import sys
 from pygame.locals import *
 import cserver
     
@@ -70,7 +71,7 @@ class Game:
                 exit()
 
 
-    def run(self, porta = 9000):
+    def run(self,porta = 9000):
         cserver.start(porta)
         while True:
             self.controls()
@@ -159,6 +160,6 @@ class Bola:
 
 if __name__ == '__main__':
     jogo = Game()
-    jogo.run(9000)
+    jogo.run(int(sys.argv[1]))
 
 

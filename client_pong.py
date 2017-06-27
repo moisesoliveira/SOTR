@@ -2,6 +2,7 @@ import cclient
 import pygame
 from pygame.locals import * 
 import os
+import sys
 
 
 class Client:
@@ -78,8 +79,8 @@ class Client:
                 exit()
 
 
-    def run(self, porta):
-        cclient.start(porta)
+    def run(self,ip, porta):
+        cclient.start(ip, porta)
         while(1):
             self.controls()
             self.recebepos()
@@ -87,8 +88,8 @@ class Client:
             pygame.display.flip()
             self.time.tick(60)
 
-
-porta = 9000
-#ip = "127.0.0.1"
-c = Client()
-c.run(porta)
+if __name__ == '__main__':
+    porta = int(sys.argv[2])
+    ip = sys.argv[1] #"127.0.0.1"
+    c = Client()
+    c.run(ip, porta)
