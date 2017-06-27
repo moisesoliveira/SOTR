@@ -16,32 +16,47 @@
 int portno;
 //buffers de envio e recepção de dados do atraves do socket
 char buffer[T_BUFF], direction[2][2];
-pthread_t t;
+pthread_t t[2], s[2];
 int newsockfd[2];
 int id = 0;
 int p1x, p2x, bx, by, s1,s2,chk;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t recept = PTHREAD_MUTEX_INITIALIZER;
 
+void *receive(void *arg){
+    int cid = (int)arg;
+    char aux[2];
+    while (1) {
+        recv(newsockfd[cid],aux,2,0);
+//        printf("recebeu: %s\n", aux);
+        pthread_mutex_lock(&recept);
+        if(aux[0]>'0')
+            strcpy(direction[cid], aux);
+        pthread_mutex_unlock(&recept);
+        bzero(aux,sizeof(aux));
+        usleep(50);
+    }
+}
+
 void *cliente(void *arg){
     int cid = (int)arg;
     int i, n;
     char aux[2];
     while (1) {
-        pthread_mutex_lock(&recept);
-        bzero(direction[cid],sizeof(direction[cid]));
-        read(newsockfd[cid],direction[cid],2);
-//        printf("\e[H\e[2J"); //printf() para limpar a tela
-//        printf("%s\n",direction[cid]);
-        pthread_mutex_unlock(&recept);
-        pthread_mutex_lock(&mutex);
+/*        pthread_mutex_lock(&recept);*/
+/*        read(newsockfd[cid],direction[cid],2);*/
+/*        bzero(direction[cid],sizeof(direction[cid]));*/
+/*        pthread_mutex_unlock(&recept);*/
+//        pthread_mutex_lock(&mutex);
             for (i = 0;i < 2; i++){
-                n = send(newsockfd[i],buffer,T_BUFF,0);
-                //if(n < 0)
-                    //printf("Erro enviando socket!\n");
+                n = send(newsockfd[cid],buffer,T_BUFF,0);
+                if(n < 0){
+                    printf("Erro enviando socket!\n");
+                    exit(1);
+                }
             }
         pthread_mutex_unlock(&mutex);
-    usleep(200);
+    usleep(100);
     }
 }
 
@@ -49,13 +64,16 @@ void *printstatus(void *arg){
 //    int id, p1x, p2x, bx, by, s1,s2,chk;
     while(1){
         printf("\e[H\e[2J"); //printf() para limpar a tela
+        printf("Server Monitor\n");
+        printf("Conectado na porta:\t %d\n", portno);
         printf("Players online:\t\t %d\n", id);
         printf("Posição do player 1:\t %d\n", p1x);
         printf("Posição do player 2:\t %d\n", p2x);
         printf("Posição da bola:\t %dx%d\n", bx,by);
         printf("Placar:\t\t\t %dx%d\n", s1, s2);
         printf("Direção do player:\t%s:%s\n", direction[0], direction[1]);
-        usleep(100);
+        printf("buffer:\t\t %s\n", buffer);
+        usleep(300);
     }
 }
 void *conn(void *arg) {
@@ -70,7 +88,6 @@ void *conn(void *arg) {
     sigprocmask(SIG_BLOCK, &alarm_sig, NULL);
     //tarefa periodica
     pthread_create(&prints, NULL, printstatus, NULL);
-    
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         printf("Erro abrindo o socket!\n");
@@ -85,7 +102,7 @@ void *conn(void *arg) {
         exit(1);
     }
     listen(sockfd,5);
-    while (id<3) {
+    while (1) {
         newsockfd[id] = accept(sockfd,(struct sockaddr *) &cli_addr,&clilen);
 	// MUTEX LOCK - GERAL
         pthread_mutex_lock(&mutex);
@@ -94,12 +111,10 @@ void *conn(void *arg) {
             exit(1);
         }
         pthread_create(&t[id], NULL, cliente, (void *)id);
+        pthread_create(&s[id], NULL, receive, (void *)id);
         id++;
 	// MUTEX UNLOCK - GERAL
         pthread_mutex_unlock(&mutex);
-    }
-    while(1){
-        sleep(1);
     }
 //    close(newsockfd);
 //    close(sockfd);

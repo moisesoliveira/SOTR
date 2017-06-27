@@ -159,6 +159,6 @@ class Bola:
 
 if __name__ == '__main__':
     jogo = Game()
-    jogo.run(9003)
+    jogo.run(9000)
 
 

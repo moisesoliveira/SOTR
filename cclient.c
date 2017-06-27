@@ -25,13 +25,17 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 int inf[7];
 
 //Tarefa responsavel por receber os dados do servidor
-void *leitura(void *arg){
+void *leitura(void *arg) {
+    int n;
     while (1) {
         pthread_mutex_lock(&mutex);
             bzero(buffer,sizeof(buffer));
-            if (recv(sockfd,buffer,T_BUFF,0) == -1) 
-                printf("Erro lendo do socket!\n");
+            n = recv(sockfd,buffer,T_BUFF,0);
         pthread_mutex_unlock(&mutex);
+        if (n <= 0) {
+            printf("Erro lendo do socket!\n");
+            exit(1);
+        }
     }
 }
 
@@ -39,13 +43,15 @@ void *printstatus(void *arg){
 //    int id, p1x, p2x, bx, by, s1,s2,chk;
     while(1){
         printf("\e[H\e[2J"); //printf() para limpar a tela
-//        printf("Players online:\t\t %d\n", id);
+        printf("Client Monitor\n");
+        printf("Conectado na porta:\t %d\n", portno);
         printf("Posição do player 1:\t %d\n", inf[1]);
         printf("Posição do player 2:\t %d\n", inf[2]);
         printf("Posição da bola:\t %dx%d\n", inf[3],inf[4]);
         printf("Placar:\t\t\t %dx%d\n", inf[5], inf[6]);
         printf("comando enviado:\t\t %s\n", direction);
-        usleep(100);
+//        printf("buffer:\t\t %s\n", buffer);
+        usleep(300);
     }
 }
 

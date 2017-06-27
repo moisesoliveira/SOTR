@@ -88,7 +88,7 @@ class Client:
             self.time.tick(60)
 
 
-porta = 9003
+porta = 9000
 #ip = "127.0.0.1"
 c = Client()
 c.run(porta)
