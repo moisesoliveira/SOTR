@@ -26,10 +26,11 @@ pthread_mutex_t recept = PTHREAD_MUTEX_INITIALIZER;
 void *cliente(void *arg){
     int cid = (int)arg;
     int i, n;
+    char aux[2];
     while (1) {
         pthread_mutex_lock(&recept);
         bzero(direction[cid],sizeof(direction[cid]));
-        n = read(newsockfd[cid],direction[cid],2);
+        read(newsockfd[cid],direction[cid],2);
 //        printf("\e[H\e[2J"); //printf() para limpar a tela
 //        printf("%s\n",direction[cid]);
         pthread_mutex_unlock(&recept);
