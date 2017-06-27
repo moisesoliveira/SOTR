@@ -23,6 +23,54 @@ int p1x, p2x, bx, by, s1,s2,chk;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t recept = PTHREAD_MUTEX_INITIALIZER;
 
+struct periodic_info {
+	int timer_fd;
+	unsigned long long wakeups_missed;
+};
+
+static int make_periodic(unsigned int period, struct periodic_info *info)
+{
+	int ret;
+	unsigned int ns;
+	unsigned int sec;
+	int fd;
+	struct itimerspec itval;
+
+	/* Create the timer */
+	fd = timerfd_create(CLOCK_MONOTONIC, 0);
+	info->wakeups_missed = 0;
+	info->timer_fd = fd;
+	if (fd == -1)
+		return fd;
+
+	/* Make the timer periodic */
+	sec = period / 1000000;
+	ns = (period - (sec * 1000000)) * 1000;
+	itval.it_interval.tv_sec = sec;
+	itval.it_interval.tv_nsec = ns;
+	itval.it_value.tv_sec = sec;
+	itval.it_value.tv_nsec = ns;
+	ret = timerfd_settime(fd, 0, &itval, NULL);
+	return ret;
+}
+
+static void wait_period(struct periodic_info *info)
+{
+	unsigned long long missed;
+	int ret;
+
+	/* Wait for the next timer event. If we have missed any the
+	   number is written to "missed" */
+	ret = read(info->timer_fd, &missed, sizeof(missed));
+	if (ret == -1) {
+		perror("read timer");
+		return;
+	}
+
+	info->wakeups_missed += missed;
+}
+
+
 void *receive(void *arg){
     int cid = (int)arg;
     char aux[2];
@@ -34,7 +82,6 @@ void *receive(void *arg){
             strcpy(direction[cid], aux);
         pthread_mutex_unlock(&recept);
         bzero(aux,sizeof(aux));
-        usleep(50);
     }
 }
 
@@ -42,12 +89,9 @@ void *cliente(void *arg){
     int cid = (int)arg;
     int i, n;
     char aux[2];
+//    struct periodic_info info;
+//    make_periodic(10000, &info);
     while (1) {
-/*        pthread_mutex_lock(&recept);*/
-/*        read(newsockfd[cid],direction[cid],2);*/
-/*        bzero(direction[cid],sizeof(direction[cid]));*/
-/*        pthread_mutex_unlock(&recept);*/
-//        pthread_mutex_lock(&mutex);
             for (i = 0;i < 2; i++){
                 n = send(newsockfd[cid],buffer,T_BUFF,0);
                 if(n < 0){
@@ -56,11 +100,13 @@ void *cliente(void *arg){
                 }
             }
         pthread_mutex_unlock(&mutex);
-    usleep(100);
+//    wait_period(&info);
     }
 }
 
 void *printstatus(void *arg){
+    struct periodic_info info;
+    make_periodic(15000, &info);
 //    int id, p1x, p2x, bx, by, s1,s2,chk;
     while(1){
         printf("\e[H\e[2J"); //printf() para limpar a tela
@@ -73,7 +119,7 @@ void *printstatus(void *arg){
         printf("Placar:\t\t\t %dx%d\n", s1, s2);
         printf("Direção do player:\t%s:%s\n", direction[0], direction[1]);
         printf("buffer:\t\t %s\n", buffer);
-        usleep(300);
+        wait_period(&info);
     }
 }
 void *conn(void *arg) {
