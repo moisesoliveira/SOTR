@@ -59,6 +59,7 @@ class Client:
 
 
     #envia os comandos do teclado para o servidor
+
     def controls(self):
         stop = 3
         up = 1
