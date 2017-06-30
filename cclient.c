@@ -92,7 +92,7 @@ void *leitura(void *arg) {
 void *printstatus(void *arg){
 //    int id, p1x, p2x, bx, by, s1,s2,chk;
     struct periodic_info info;
-    make_periodic(15000, &info);
+    make_periodic(150, &info);
     while(1){
         printf("\e[H\e[2J"); //printf() para limpar a tela
         printf("Client Monitor\n");
@@ -118,7 +118,7 @@ void *client(void *arg) {
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     struct periodic_info info;
-    make_periodic(150, &info);
+    make_periodic(15, &info);
     sigemptyset(&alarm_sig);
     sigaddset(&alarm_sig, SIGALRM);
     sigprocmask(SIG_BLOCK, &alarm_sig, NULL);

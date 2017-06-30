@@ -20,8 +20,10 @@ pthread_t t[2], s[2];
 int newsockfd[2];
 int id = 0;
 int p1x, p2x, bx, by, s1,s2,chk;
+
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t recept = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond_var = PTHREAD_COND_INITIALIZER;
 
 struct periodic_info {
 	int timer_fd;
@@ -90,7 +92,7 @@ void *cliente(void *arg){
     int i, n;
     char aux[2];
     struct periodic_info info;
-    make_periodic(15000, &info);
+    make_periodic(15, &info);
     while (1) {
             for (i = 0;i < 2; i++){
                 n = send(newsockfd[cid],buffer,T_BUFF,0);
@@ -159,6 +161,8 @@ void *conn(void *arg) {
         pthread_create(&t[id], NULL, cliente, (void *)id);
         pthread_create(&s[id], NULL, receive, (void *)id);
         id++;
+        if(id==2)
+            pthread_cond_signal(&cond_var);
 	// MUTEX UNLOCK - GERAL
         pthread_mutex_unlock(&mutex);
     }
@@ -174,6 +178,7 @@ static PyObject *cserver_start(PyObject *self, PyObject *args){
         return NULL;
     printf("cserver, iniciando na porta %d!\n", portno);
     pthread_create(&con, NULL, conn, NULL);
+    pthread_cond_wait( &cond_var, &mutex);
     Py_RETURN_NONE;
 }
 
